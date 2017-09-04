@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import re
+import time
 import pickle
 import urllib,urllib2
 import requests
@@ -19,7 +20,6 @@ class DoubanFM(AbstractFM):
 
     def is_available(cls):
         return (super(cls, cls).is_available() and
-                diagnose.check_executable('mplayer') and
                 diagnose.check_network_connection('www.douban.com'))
 
     def __init__(self, account_id, password, douban_id=None,
@@ -222,21 +222,27 @@ class DoubanFM(AbstractFM):
         return sid
 
     def playNextLikeSong(self):
+        self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='r',sid=sid)
         self.playSong()
 
     def playNextUnLikeSong(self):
+        self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='u',sid=sid)
         self.playSong()
 
     def playNextBanSong(self):
+        if self._mplay_process.pid is not None:
+            self._mplay_process.kill()
         sid = self._getSidFromLocal()
         self.getSong(type='b',sid=sid)
         self.playSong()
 
     def playNextActionSong(self):
+        if self._mplay_process.pid is not None:
+            self._mplay_process.kill()
         sid = self._getSidFromLocal()
         self.getSong(type='p',sid=sid)
         self.playSong()
@@ -267,3 +273,27 @@ class DoubanFM(AbstractFM):
             except IndexError,TypeError:
                 self._logger.error("播放%s 失败",url)
                 pass
+
+    def start(self, command_callback=None,
+              interrupt_check=lambda: False,
+              sleep_time=0.03):
+        
+        self._logger.debug("douban fm start")
+        while True:
+            if interrupt_check():
+                self._logger.debug("douban fm break")
+                break
+            self.playNextSong()
+            if command_callback is not None:
+                time.sleep(sleep_time)
+                command = command_callback()
+                operator = {
+                    #"p": self.playNextSong,
+                    "s": self.playNextActionSong,
+                    "r": self.playNextLikeSong,
+                    "u": self.playNextUnLikeSong,
+                    "b": self.playNextBanSong,
+                }
+                operator[command]()
+
+        self._logger.debug("douban fm over")

@@ -3,9 +3,21 @@
 import sys
 import argparse
 import logging
+import signal
 
 from lib.voice.baiduVoice import BaiduVoice
 from plugin.fm.doubanFM import DoubanFM
+
+interrupted = False
+
+def signal_handler(signal, frame):
+    global interrupted
+    interrupted = True
+
+
+def interrupt_callback():
+    global interrupted
+    return interrupted
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='doubanFM pi')
@@ -23,8 +35,8 @@ if __name__ == '__main__':
 
     baidu_voice.say("开始播放豆瓣电台")
 
-    for i in range(0,100):
-        douban_fm.playNextSong()
+    signal.signal(signal.SIGINT, signal_handler)
 
-    
+    douban_fm.start(interrupt_check=interrupt_callback,sleep_time=0.05)
+
 

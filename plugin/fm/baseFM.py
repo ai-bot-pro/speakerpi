@@ -15,14 +15,18 @@ class AbstractFM(AbstractClass):
     """
     @classmethod
     def is_available(cls):
-        return super(cls, cls).is_available() 
+        return (super(cls, cls).is_available() and
+                diagnose.check_executable('mplayer'))
 
     def mplay(self, url):
         cmd = ['mplayer', str(url)]
-        self._logger.debug('Executing %s', ' '.join([pipes.quote(arg) for arg in cmd]))
+        cmd_str = ' '.join([pipes.quote(arg) for arg in cmd])
+        self._logger.debug('Executing %s', cmd_str)
 
         with tempfile.TemporaryFile() as f:
-            subprocess.call(cmd, stdout=f, stderr=f)
+            self._mplay_process = subprocess.Popen(cmd,stdout=f,stderr=f)
+            self._logger.debug("mplayer pid: '%d'", self._mplay_process.pid)
+            self._mplay_process.wait()
             f.seek(0)
             output = f.read()
             if output:
