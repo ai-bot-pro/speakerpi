@@ -1,5 +1,0 @@
-voice:
-    app_id: '10074270'
-    api_key: 'nXPzRHTusiS3uOKKO5lpXNNX'
-    secret_key: 'f538cfbbaa531c650614dc475d0cd903'
-    per: 0  # 发音人选择 0：女生；1：男生；3：度逍遥；4：度丫丫
