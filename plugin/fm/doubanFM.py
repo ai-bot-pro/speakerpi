@@ -23,9 +23,12 @@ class DoubanFM(AbstractFM):
                 diagnose.check_network_connection('www.douban.com'))
 
     def __init__(self, account_id, password, douban_id=None,
-            cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt')):
+            cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
+            cur_song_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cur_song.txt')):
         super(self.__class__, self).__init__()
         self.ck = None
+        self._song = {}
+        self._cur_song_file = cur_song_file
         self.douban_id = douban_id
         self.cookie_file = cookie_file
         self.data = {
@@ -86,7 +89,7 @@ class DoubanFM(AbstractFM):
             self.session.cookies.update(cookies)
         with open(self.cookie_file, 'w') as f:
             pickle.dump(requests.utils.dict_from_cookiejar(self.session.cookies), f)
-        self._logger.info('save cookies to file.')
+        self._logger.debug('save cookies to file.')
 
     def get_ck(self):
         '''
@@ -98,7 +101,7 @@ class DoubanFM(AbstractFM):
         cookies = self.session.cookies.get_dict()
         headers = dict(r.headers)
         if headers.has_key('Set-Cookie'):
-            self._logger.info('cookies is end of date, login again')
+            self._logger.debug('cookies is end of date, login again')
             self.ck = None
             self.get_new_cookies()
         elif cookies.has_key('ck'):
@@ -140,37 +143,117 @@ class DoubanFM(AbstractFM):
             return False
         return True
 
-    def getSong(self):
+    def getRecentChannels(self):
+        """
+        获取最近听过的电台频道
+        """
+        url = "https://douban.fm/j/v2/rec_channels?specific=all"
+        payloads = { }
+        response = self.session.get(url, params=payloads, cookies=self.session.cookies.get_dict())
+        res = json.loads(response.text)
+
+        return res
+    
+    def getRecentPlaySource(self):
+        """
+        获取最近听过的播放资源
+        """
+        url = "https://douban.fm/j/v2/recent_playsource"
+        payloads = { }
+        response = self.session.get(url, params=payloads, cookies=self.session.cookies.get_dict())
+        res = json.loads(response.text)
+
+        return res
+
+
+    def getSong(self,type='p',sid=None,channel=0):
         """
         @brief
             获取私人电台当前播放歌曲信息 
         @params
-            none
+            type: 获取类型, 默认p
+                n:开始 p: 自然播放下首 s: 下首触发 r: 喜欢推荐触发 u: 不喜欢触发 b: 删除不在播放触发 (n,p应该是纯播放，未有人为操作)
+            sid: 当前播放歌曲id, 默认为None
+                这个应该是用来定义推荐歌手系类别(喜欢某个sid，会推荐相似sid的歌曲,咦~推荐系统)
+            channel: 播放频道,默认0
         @return 
             dict 歌曲信息 or None
         """
         url = "https://douban.fm/j/v2/playlist?"
         payloads = {
-            "channel":0,
+            "channel":channel,#初始频道为0
             "kbps":192,
             "client":"s:mainsite|y:3.0",
             "app_name":"radio_website",
             "version":100,
-            "type":"s",
-            "sid":"1541494",#这个应该是用来定义推荐歌手系类别(喜欢某个sid，会推荐相似sid的歌曲,咦~推荐系统)
-            "pt":"126199.74799999999",
-            "pb":128,
-            "apikey":"",
+            "type":type,
         }
+        if (sid is not None) or (type=='n'):
+            payloads_song = {
+                "sid":sid,
+                "pt":"126199.74799999999",#未知，可以为空
+                "pb":128,
+                "apikey":"",
+            }
+            payloads = dict(payloads,**payloads_song)
+
+        self._logger.debug("get song url: %s,params: %s",url,payloads)
         response = self.session.get(url, params=payloads, cookies=self.session.cookies.get_dict())
         res = json.loads(response.text)
         song = None
         if('song' in res):
-            song = res['song'][0]
+            song = self._song = res['song'][0]
+            with open(self._cur_song_file, 'w') as f:
+                pickle.dump(json.dumps(song), f)
+
         return song
-    
-    def play(self):
-        song = self.getSong()
+
+    def _getSidFromLocal(self):
+        '''
+        从本地文件获取sid
+        '''
+        sid = None
+        if os.path.exists(self._cur_song_file):
+            with open(self._cur_song_file, 'r') as f:
+                song = json.loads(pickle.load(f))
+                if 'sid' in song:
+                    sid = song['sid']
+
+        return sid
+
+    def playNextLikeSong(self):
+        sid = self._getSidFromLocal()
+        self.getSong(type='r',sid=sid)
+        self.playSong()
+
+    def playNextUnLikeSong(self):
+        sid = self._getSidFromLocal()
+        self.getSong(type='u',sid=sid)
+        self.playSong()
+
+    def playNextBanSong(self):
+        sid = self._getSidFromLocal()
+        self.getSong(type='b',sid=sid)
+        self.playSong()
+
+    def playNextActionSong(self):
+        sid = self._getSidFromLocal()
+        self.getSong(type='p',sid=sid)
+        self.playSong()
+
+    def playNextSong(self):
+        '''
+        自然播放到下首歌
+        '''
+        sid = self._getSidFromLocal()
+        type = 'p'
+        if sid is None:
+            type='n'
+        self.getSong(type=type,sid=sid)
+        self.playSong()
+        
+    def playSong(self):
+        song = self._song
         if song is not None:
             try:
                 albumtitle = song['albumtitle'].encode('UTF-8')
@@ -181,5 +264,6 @@ class DoubanFM(AbstractFM):
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
                 BaiduVoice.get_instance().say(singer_info)
                 self.mplay(url)
-            except IndexError:
+            except IndexError,TypeError:
+                self._logger.error("播放%s 失败",url)
                 pass

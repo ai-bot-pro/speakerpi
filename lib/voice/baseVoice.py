@@ -1,12 +1,16 @@
 # -*- coding: utf-8-*-
 
+import os
 import logging
 import pipes
 import tempfile
 import subprocess
 from abc import ABCMeta, abstractmethod
 
+import yaml
+
 import lib.diagnose
+import lib.appPath
 
 class AbstractVoiceEngine(object):
     """
@@ -31,7 +35,13 @@ class AbstractVoiceEngine(object):
 
     def __init__(self, **kwargs):
         self._logger = logging.getLogger(__name__)
-        self._logger.setLevel(logging.INFO)
+
+        config_path = os.path.join(lib.appPath.CONFIG_PATH, 'log.yml');
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                profile = yaml.safe_load(f)
+                if 'level' in profile:
+                    self._logger.setLevel(eval("logging."+profile['level']))
 
     @abstractmethod
     def say(self, phrase, *args):

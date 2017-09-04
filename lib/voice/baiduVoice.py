@@ -30,7 +30,7 @@ class BaiduVoice(AbstractVoiceEngine):
     @classmethod
     def get_config(cls):
         config = {}
-        config_path = os.path.join(lib.appPath.CONFIG_PATH, 'baidu.yml');
+        config_path = os.path.join(lib.appPath.CONFIG_PATH, 'baidu.yml')
         if os.path.exists(config_path):
             with open(config_path, 'r') as f:
                 profile = yaml.safe_load(f)

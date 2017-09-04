@@ -24,7 +24,7 @@ if __name__ == '__main__':
     baidu_voice.say("开始播放豆瓣电台")
 
     for i in range(0,100):
-        douban_fm.play()
+        douban_fm.playNextSong()
 
     
 
