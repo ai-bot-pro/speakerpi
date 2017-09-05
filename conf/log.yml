@@ -1,4 +1,0 @@
-#日志级别介绍: https://docs.python.org/2/library/logging.html#logging-levels
-#正常运行用INFO
-#调试运行用DEBUG
-level: DEBUG
