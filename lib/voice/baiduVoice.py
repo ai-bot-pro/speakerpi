@@ -63,3 +63,10 @@ class BaiduVoice(AbstractVoiceEngine):
                 f.write(result)
         self.play(self._output_file)
         os.remove(self._output_file)
+
+    def asr(self,record_file=os.path.join(lib.appPath.DATA_PATH,"baidu_record.wav")):
+        if os.path.exists(record_file):
+            with open(record_file, 'rb') as f:
+                records = f.read()
+                aipSpeech.asr(records, 'wav', 16000, { 'lan': 'zh', })
+

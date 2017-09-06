@@ -1,0 +1,11 @@
+#语音唤醒: tag
+passive_stt_engine: "snowboy"
+#语音识别: tag
+active_stt_engine: "baidu-ai-voice"
+#语音合成: tag
+speak_engine: "baidu-ai-voice"
+
+#插件
+plugins:
+    # 模块类型: 模块tag,模块tag...
+    fm: "douban" #多个相同类别的插件用,隔开

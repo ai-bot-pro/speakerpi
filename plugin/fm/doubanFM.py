@@ -16,11 +16,46 @@ import lib.appPath
 from baseFM import AbstractFM
 from lib.voice.baiduVoice import BaiduVoice
 
+interrupted = False
+
+def signal_handler(signal, frame):
+    global interrupted
+    interrupted = True
+
+def interrupt_callback():
+    global interrupted
+    return interrupted
+
+TAG = 'douban'
+
+def dispatch_command_callback(text):
+    command = ''
+    if re.search('播放', text): command = "p"
+    if re.search('下一首', text): command = "s"
+    if re.search('喜欢', text): command = "r"
+    if re.search('不喜欢', text): command = "u"
+    if re.search('删除', text): command = "b"
+    if re.search('不再播放', text): command = "b"
+    return command
+
+def handle(text,speacker):
+    if text == "播放豆瓣电台":
+        speacker.say("开始播放豆瓣电台")
+    douban_fm = DoubanFM.get_instance()
+    douban_fm.set_speaker(speacker)
+    douban_fm.start(text=text,interrupt_check=interrupt_callback,play_command_callback=dispatch_command_callback,sleep_time=0.05)
+
+def isValid(text):
+    return any(word in text for word in ["播放豆瓣电台","下一首", "暂停","播放","喜欢这首歌","不喜欢这首歌","删除这首歌","不再播放这首歌","下载","下载这首歌"])
+
 class DoubanFM(AbstractFM):
 
     def is_available(cls):
         return (super(cls, cls).is_available() and
                 diagnose.check_network_connection('www.douban.com'))
+
+    def set_speaker(self,speacker):
+        self.speacker = speacker
 
     def __init__(self, account_id, password, douban_id=None,
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
@@ -222,18 +257,21 @@ class DoubanFM(AbstractFM):
         return sid
 
     def playNextLikeSong(self):
+        self._logger.debug("douban fm play next like song")
         self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='r',sid=sid)
         self.playSong()
 
     def playNextUnLikeSong(self):
+        self._logger.debug("douban fm play next unlike song")
         self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='u',sid=sid)
         self.playSong()
 
     def playNextBanSong(self):
+        self._logger.debug("douban fm play next ban song")
         if self._mplay_process.pid is not None:
             self._mplay_process.kill()
         sid = self._getSidFromLocal()
@@ -241,6 +279,7 @@ class DoubanFM(AbstractFM):
         self.playSong()
 
     def playNextActionSong(self):
+        self._logger.debug("douban fm play next action song")
         if self._mplay_process.pid is not None:
             self._mplay_process.kill()
         sid = self._getSidFromLocal()
@@ -268,13 +307,13 @@ class DoubanFM(AbstractFM):
                 artist = song['artist'].encode('UTF-8')
                 region = song['singers'][0]['region'][0].encode('UTF-8')
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
-                BaiduVoice.get_instance().say(singer_info)
+                self.speacker.say(singer_info)
                 self.mplay(url)
-            except IndexError,TypeError:
+            except IndexError:
                 self._logger.error("播放%s 失败",url)
                 pass
 
-    def start(self, command_callback=None,
+    def start(self, text, play_command_callback=None,
               interrupt_check=lambda: False,
               sleep_time=0.03):
         
@@ -284,9 +323,9 @@ class DoubanFM(AbstractFM):
                 self._logger.debug("douban fm break")
                 break
             self.playNextSong()
-            if command_callback is not None:
+            if play_command_callback is not None:
                 time.sleep(sleep_time)
-                command = command_callback()
+                command = play_command_callback(text)
                 operator = {
                     #"p": self.playNextSong,
                     "s": self.playNextActionSong,
@@ -297,3 +336,6 @@ class DoubanFM(AbstractFM):
                 operator[command]()
 
         self._logger.debug("douban fm over")
+
+
+
