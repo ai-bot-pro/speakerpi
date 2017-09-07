@@ -14,7 +14,7 @@ class Conversation(object):
         self.active_stt = active_stt
         self.passive_stt = passive_stt
         self.bootstrap_config = bootstrap_config
-        self.bootstrap = Bootstrap(active_stt, bootstrap_config)
+        self.bootstrap = Bootstrap(speaker, bootstrap_config)
 
     def handleForever(self):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)

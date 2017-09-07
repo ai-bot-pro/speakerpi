@@ -9,12 +9,15 @@ import pickle
 import urllib,urllib2
 import requests
 import requests.utils
+import psutil
 
 import yaml
 
 import lib.appPath
 from baseFM import AbstractFM
 from lib.voice.baiduVoice import BaiduVoice
+
+import signal
 
 interrupted = False
 
@@ -26,16 +29,21 @@ def interrupt_callback():
     global interrupted
     return interrupted
 
+# capture SIGINT signal, e.g., Ctrl+C
+signal.signal(signal.SIGINT, signal_handler)
+
 TAG = 'douban'
 
 def dispatch_command_callback(text):
-    command = ''
-    if re.search('播放', text): command = "p"
+    command = 'p'
+    if re.search('播放豆瓣电台', text): command = "p"
     if re.search('下一首', text): command = "s"
     if re.search('喜欢', text): command = "r"
     if re.search('不喜欢', text): command = "u"
     if re.search('删除', text): command = "b"
     if re.search('不再播放', text): command = "b"
+    if re.search('暂停', text): command = "stop"
+    if re.search('继续播放', text): command = "continue"
     return command
 
 def handle(text,speacker):
@@ -46,13 +54,16 @@ def handle(text,speacker):
     douban_fm.start(text=text,interrupt_check=interrupt_callback,play_command_callback=dispatch_command_callback,sleep_time=0.05)
 
 def isValid(text):
-    return any(word in text for word in ["播放豆瓣电台","下一首", "暂停","播放","喜欢这首歌","不喜欢这首歌","删除这首歌","不再播放这首歌","下载","下载这首歌"])
+    global interrupted
+    res = any(word in text for word in ["播放豆瓣电台","下一首", "暂停","播放","喜欢这首歌","不喜欢这首歌","删除这首歌","不再播放这首歌","下载","下载这首歌"])
+    if res is True: interrupted = False
+    return res
 
 class DoubanFM(AbstractFM):
 
     def is_available(cls):
         return (super(cls, cls).is_available() and
-                diagnose.check_network_connection('www.douban.com'))
+                lib.diagnose.check_network_connection('www.douban.com'))
 
     def set_speaker(self,speacker):
         self.speacker = speacker
@@ -62,6 +73,7 @@ class DoubanFM(AbstractFM):
             cur_song_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cur_song.txt')):
         super(self.__class__, self).__init__()
         self.ck = None
+        self._mplay_process = None
         self._song = {}
         self._cur_song_file = cur_song_file
         self.douban_id = douban_id
@@ -292,11 +304,34 @@ class DoubanFM(AbstractFM):
         '''
         sid = self._getSidFromLocal()
         type = 'p'
-        if sid is None:
+        if sid is None:#最开始,未有播放记录
             type='n'
         self.getSong(type=type,sid=sid)
         self.playSong()
         
+    def stopSong(self):
+        """
+        暂停播放当前歌曲
+        """
+        res = None
+        self._logger.debug("douban fm stop playing song")
+        if self._mplay_process.pid is not None:
+            self._logger.debug("pid: %d",self._mplay_process.pid)
+            res = psutil.Process(self._mplay_process.pid).suspend()
+
+        return res
+    
+    def continue2PlaySong(self):
+        """
+        继续播放当前歌曲
+        """
+        res = None
+        self._logger.debug("douban fm continue to play song")
+        if self._mplay_process.pid is not None:
+            self._logger.debug("pid: %d",self._mplay_process.pid)
+            res = psutil.Process(self._mplay_process.pid).resume()
+        return res
+
     def playSong(self):
         song = self._song
         if song is not None:
@@ -322,20 +357,22 @@ class DoubanFM(AbstractFM):
             if interrupt_check():
                 self._logger.debug("douban fm break")
                 break
-            self.playNextSong()
             if play_command_callback is not None:
                 time.sleep(sleep_time)
                 command = play_command_callback(text)
                 operator = {
-                    #"p": self.playNextSong,
+                    "p": self.playNextSong,
                     "s": self.playNextActionSong,
                     "r": self.playNextLikeSong,
                     "u": self.playNextUnLikeSong,
                     "b": self.playNextBanSong,
+                    "stop": self.stopSong,
                 }
-                operator[command]()
+                if operator.has_key(command):
+                    operator[command]()
+                else:
+                    self.playNextSong()
 
         self._logger.debug("douban fm over")
-
 
 

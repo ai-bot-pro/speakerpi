@@ -10,21 +10,21 @@ class Bootstrap(object):
         """
         加载插件，通过指令引导执行对应插件模块
         """
-        self.speacker = speacker
-        self.config = config
-        self.plugins = self.get_plugins()
         self._logger = lib.util.init_logger(__name__)
+        self.speaker = speaker
+        self.config = config
+        self.plugins = []
 
     @classmethod
-    def get_plugins(cls):
+    def get_plugins(self,config):
         """
         通过引导配置获取插件模块，通过插件模块中的PRIORITY属性控制优先级，按大到小排序，越大越优先
         """
         plugins = []
         locations = []
         tags = []
-        if "plugins" in self.config:
-            for (cate,plugin_tags) in self.config['plugins'].items():
+        if "plugins" in config:
+            for (cate,plugin_tags) in config['plugins'].items():
                 locations.append(os.path.join(lib.appPath.PLUGIN_PATH,cate))
                 tags.append(plugin_tags)
 
@@ -49,6 +49,8 @@ class Bootstrap(object):
 
         plugins.sort(key=lambda mod: mod.PRIORITY if hasattr(mod, 'PRIORITY') else 0, reverse=True)
 
+        self.plugins = plugins
+
         return plugins
 
     def query(self, texts):
@@ -60,10 +62,10 @@ class Bootstrap(object):
                 if plugin.isValid(text):
                     self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.__name__)
                     try:
-                        plugin.handle(text, self.speacker)
+                        plugin.handle(text, self.speaker)
                     except Exception:
                         self._logger.error('Failed to execute plugin', exc_info=True)
-                        self.speacker.say("遇到一些麻烦，请重试一次")
+                        self.speaker.say("遇到一些麻烦，请重试一次")
                     else:
                         self._logger.debug("Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.__name__)
                     finally:

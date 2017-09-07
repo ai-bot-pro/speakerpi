@@ -31,7 +31,7 @@ class AbstractVoiceEngine(object):
     @classmethod
     @abstractmethod
     def is_available(cls):
-        return diagnose.check_executable('play')
+        return lib.diagnose.check_executable('play')
 
     def __init__(self, **kwargs):
         self._logger = logging.getLogger(__name__)
@@ -45,6 +45,10 @@ class AbstractVoiceEngine(object):
 
     @abstractmethod
     def say(self, phrase, *args):
+        pass
+
+    @abstractmethod
+    def transcribe(self, fp):
         pass
 
     def play(self, filename):

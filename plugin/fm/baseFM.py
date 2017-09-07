@@ -16,7 +16,7 @@ class AbstractFM(AbstractClass):
     @classmethod
     def is_available(cls):
         return (super(cls, cls).is_available() and
-                diagnose.check_executable('mplayer'))
+                lib.diagnose.check_executable('mplayer'))
 
     def mplay(self, url):
         cmd = ['mplayer', str(url)]

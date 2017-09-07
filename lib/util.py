@@ -34,16 +34,16 @@ def get_subclasses(cls):
 
     return subclasses
 
-def get_engines_by_type(type='voice'):
+def get_engines_by_cate(cate='voice'):
     '''
     通过类型获取引擎list
     '''
-    if type is 'voice':
+    if cate is 'voice':
         return [engine for engine in
             list(get_subclasses(AbstractVoiceEngine))
             if hasattr(engine, 'TAG') and engine.TAG]
 
-def get_engine_by_tag(tag=None,type='voice'):
+def get_engine_by_tag(tag=None,cate='voice'):
     """
     通过标签获取可用引擎
     没有引擎抛出异常
@@ -52,7 +52,7 @@ def get_engine_by_tag(tag=None,type='voice'):
         raise TypeError("Invalid engine tag '%s'", tag)
 
     selected_engines = filter(lambda engine: hasattr(engine, "TAG") and
-                              engine.TAG == tag, get_engines(type))
+                              engine.TAG == tag, get_engines_by_cate(cate))
     if len(selected_engines) == 0:
         raise ValueError("No STT engine found for tag '%s'" % tag)
     else:

@@ -29,10 +29,20 @@ class RingBuffer(object):
 
 class RawTextMic:
     '''
-    命令行文字输入代替语音输入（测试使用,语音识别率不高的情况下使用，比如噪音，远距离)
+    命令行文字输入代替语音输入（测试调试使用)
     '''
     def __init__(self):
         pass
+
+    def passiveListen(self, detected_word, transcribe_callback=None):
+        return True,detected_word
+
+    def activeListenToAllOptions(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None):
+        return [activeListen(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None)]
+
+    def activeListen(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None):
+        input = raw_input("YOU: ")
+        return input
 
 class Mic:
     '''
@@ -185,7 +195,7 @@ class Mic:
             wav_fp.close()
             f.seek(0)
             # check if detected_word was said
-            if stt_callback is not None:
+            if transcribe_callback is not None:
                 transcribed = transcribe_callback(f)
             else:
                 self._logger.error("passive listen no transcribe callback function")
@@ -222,7 +232,8 @@ class Mic:
             THRESHOLD = self.fetchThreshold()
 
         if speak_callback is not None:
-            speak_callback(os.path.join(lib.appPath.DATA_PATH,"audio/beep_hi.wav"))
+            print(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
+            speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
 
         # prepare recording stream
         stream = self._audio.open(format=pyaudio.paInt16,
@@ -252,7 +263,8 @@ class Mic:
                 break
 
         if speak_callback is not None:
-            speak_callback(os.path.join(lib.appPath.DATA_PATH,"audio/beep_lo.wav"))
+            print(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/dong.wav"))
+            speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/dong.wav"))
 
         # save the audio data
         stream.stop_stream()
@@ -267,7 +279,7 @@ class Mic:
             wav_fp.close()
             f.seek(0)
             # check if detected_word was said
-            if stt_callback is not None:
+            if transcribe_callback is not None:
                 transcribed = transcribe_callback(f)
             else:
                 self._logger.error("passive listen no transcribe callback function")
@@ -294,8 +306,4 @@ class Mic:
         self.record_thread = threading.Thread(target = self.record_proc)
         self.record_thread.start()
 
-if __name__ == '__main__':
-    mic = Mic()
-    mic.init_recording()
-    
 

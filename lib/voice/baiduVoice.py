@@ -2,6 +2,8 @@
 
 import sys
 import os
+import json
+import requests
 
 import yaml
 
@@ -18,7 +20,7 @@ class BaiduVoice(AbstractVoiceEngine):
     """
     Uses the Baidu AI Cloud Services.
     """
-    TAG = "baidu-ai"
+    TAG = "baidu-ai-voice"
 
     def __init__(self, app_id='', api_key='', secret_key='',
             per=0, output_file=os.path.join(lib.appPath.DATA_PATH, 'baidu_voice.mp3')):
@@ -51,8 +53,8 @@ class BaiduVoice(AbstractVoiceEngine):
     @classmethod
     def is_available(cls):
         return (super(cls, cls).is_available() and
-                diagnose.check_python_import('baidu-aip') and
-                diagnose.check_network_connection('www.baidu.com'))
+                lib.diagnose.check_python_import('aip') and
+                lib.diagnose.check_network_connection('www.baidu.com'))
 
     def say(self, phrase):
         self._logger.debug("Saying '%s' with '%s'", phrase, self.TAG)
@@ -64,9 +66,15 @@ class BaiduVoice(AbstractVoiceEngine):
         self.play(self._output_file)
         os.remove(self._output_file)
 
-    def asr(self,record_file=os.path.join(lib.appPath.DATA_PATH,"baidu_record.wav")):
-        if os.path.exists(record_file):
-            with open(record_file, 'rb') as f:
-                records = f.read()
-                aipSpeech.asr(records, 'wav', 16000, { 'lan': 'zh', })
+    def transcribe(self,fp):
+        fp.seek(0)
+        records = fp.read()
+        dict_data = self._aipSpeech.asr(records, 'wav', 16000, { 'lan': 'zh', })
+        self._logger.debug('baidu stt response: %s',json.dumps(dict_data))
+        transcribed = []
+        if 'result' in dict_data:
+            text = dict_data['result'][0].encode('utf-8')
+            transcribed.append(text.upper())
+            self._logger.info('百度语音识别到了: %s', text)
+        return transcribed
 
