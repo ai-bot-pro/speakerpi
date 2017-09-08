@@ -34,4 +34,4 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 1. [init系统介绍](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html)
 2. [snowboy](http://docs.kitt.ai/snowboy/)
 3. [jtbot](https://github.com/ibmtjbot/tjbot)
-4. [jasper-client](https://github.com/jasperproject/jasper-client)
+4. [jasper-client](http://jasperproject.github.io/documentation/)
