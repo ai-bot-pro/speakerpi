@@ -2,11 +2,13 @@
 import lib.util
 from plugin.bootstrap import Bootstrap
 
+
 class Conversation(object):
     """
     会话交互
     """
-    def __init__(self, robot_name, mic, speaker, active_stt, passive_stt, bootstrap_config):
+    def __init__(self, robot_name, mic,
+            speaker, active_stt, passive_stt, bootstrap_config):
         self._logger = lib.util.init_logger(__name__)
         self.robot_name = robot_name
         self.mic = mic
@@ -14,10 +16,11 @@ class Conversation(object):
         self.active_stt = active_stt
         self.passive_stt = passive_stt
         self.bootstrap_config = bootstrap_config
-        self.bootstrap = Bootstrap(speaker, bootstrap_config)
+        #self.bootstrap = Bootstrap(speaker, bootstrap_config)
 
-    def handleForever(self,interrupt_check=None):
+    def handleForever(self,interrupt_check=None,queue=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
+        self.speaker.say("hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我")
         while True:
             if interrupt_check is not None:
                 if interrupt_check(): break
@@ -38,7 +41,8 @@ class Conversation(object):
                     transcribe_callback=self.active_stt.transcribe)
             self._logger.debug("Stopped to listen actively with threshold: %r", threshold)
 
-            if input:
-                self.bootstrap.query(input)
+            if input and queue is not None:
+                queue.put(input)
+                #self.bootstrap.query(input)
             else:
                 self.speaker.say("没听清楚，请再说一次")

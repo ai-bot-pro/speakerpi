@@ -12,6 +12,9 @@ baidu-aip==1.6.4.0
 # NLP
 zhon==1.1.5
 
+# process
+multiprocessing==2.6.2.1
+
 ## follow lib maybe use
 
 # Pocketsphinx STT engine

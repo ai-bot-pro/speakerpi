@@ -50,10 +50,11 @@ class Bootstrap(object):
 
         return plugins
 
-    def query(self, texts):
+    def query(self, queue=None):
         """
         引导识别的texts给对应的插件处理
         """
+        texts = queue.get(True)
         for plugin in self.plugins:
             for text in texts:
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
@@ -64,7 +65,7 @@ class Bootstrap(object):
                         plugin.handle(text, self.speaker)
                     except Exception:
                         self._logger.error('Failed to execute plugin', exc_info=True)
-                        self.speaker.say("遇到一些麻烦，请重试一次")
+                        #self.speaker.say("遇到一些麻烦，请重试一次")
                     else:
                         self._logger.debug("Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.__name__)
                     finally:

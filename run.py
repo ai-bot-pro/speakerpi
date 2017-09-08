@@ -5,6 +5,7 @@ import os
 import yaml
 import argparse
 import logging
+from multiprocessing import Process, Queue
 
 from lib.voice.baiduVoice import BaiduVoice
 from lib.voice.snowboyVoice import SnowboyVoice
@@ -91,8 +92,19 @@ def run(robot_name="ROBOT"):
             passive_stt_engine_class.get_instance(),
             bootstrap_config)
 
+    #插件引导初始
+    bootstrap = Bootstrap(speak_engine_class.get_instance(),
+            bootstrap_config)
+
     #开始交互
-    conversation.handleForever(interrupt_check=interrupt_callback)
+    #conversation.handleForever(interrupt_check=interrupt_callback)
+    queue = Queue()
+    conversation_process = Process(target=conversation.handleForever,args=(interrupt_callback,queue,))
+    bootstrap_process = Process(target=bootstrap.query,args=(queue,))
+    conversation_process.start()
+    bootstrap_process.start()
+    conversation_process.join()
+    bootstrap_process.join()
 
 def debugDoubanFm():
     baidu_voice = BaiduVoice.get_instance()

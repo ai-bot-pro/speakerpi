@@ -1,12 +1,55 @@
 # -*- coding: utf-8-*-
 
 import os
+import sys
 import logging
 import yaml
 import re
 
 from lib.voice.baseVoice import AbstractVoiceEngine
 import lib.appPath
+
+def create_daemon(daemon_callback,**args):
+    '''
+    创建守护进程，daemon_callback 为运行守护进程的函数, args为对应运行函数参数
+    '''
+    #产生子进程，而后父进程退出
+    try:
+        if os.fork() > 0:
+            sys.exit(0)
+    except OSError, error:
+        print("fork #1 failed: %d (%s)"%(error.errno,error.strerror))
+        sys.exit(1)
+
+    #修改子进程工作目录
+    os.chdir("/")
+    #创建新的会话，子进程成为会话的首进程
+    os.setsid()
+    #修改工作目录的umask
+    os.umask(0)
+
+    #创建孙子进程，而后子进程退出
+    try:
+        pid = os.fork()
+        if pid > 0:
+            print('Daemon pid is %d' % pid)
+            sys.exit(0)
+    except OSError, error:
+        print("fork #2 failed: %d (%s)"%(error.errno,error.strerror))
+        sys.exit(1)
+
+    #重定向标准输入流、标准输出流、标准错误
+    sys.stdout.flush()
+    sys.stderr.flush()
+    si = file("/dev/null", 'r')
+    so = file("/dev/null", 'a+')
+    se = file("/dev/null", 'a+', 0)
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+    
+    daemon_callback(args)
+
 
 def filt_punctuation(text):
     """

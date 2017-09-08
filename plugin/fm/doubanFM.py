@@ -35,19 +35,21 @@ signal.signal(signal.SIGINT, signal_handler)
 TAG = 'douban'
 
 def dispatch_command_callback(text):
+    global interrupted
     command = 'p'
-    if re.search('播放豆瓣电台', text): command = "p"
-    if re.search('下一首', text): command = "s"
-    if re.search('喜欢', text): command = "r"
-    if re.search('不喜欢', text): command = "u"
-    if re.search('删除', text): command = "b"
-    if re.search('不再播放', text): command = "b"
-    if re.search('暂停', text): command = "stop"
-    if re.search('继续播放', text): command = "continue"
+    if re.search(u'播放豆瓣电台', text): command = "p"
+    if re.search(u'下一首', text): command = "s"
+    if re.search(u'喜欢', text): command = "r"
+    if re.search(u'不喜欢', text): command = "u"
+    if re.search(u'删除', text): command = "b"
+    if re.search(u'不再播放', text): command = "b"
+    if re.search(u'暂停', text): command = "stop"
+    if re.search(u'继续播放', text): command = "continue"
+    if re.search(u'结束豆瓣电台', text): interrupted = True
     return command
 
 def handle(text,speacker):
-    if text == "播放豆瓣电台":
+    if text == u"播放豆瓣电台":
         speacker.say("开始播放豆瓣电台")
     douban_fm = DoubanFM.get_instance()
     douban_fm.set_speaker(speacker)
@@ -66,6 +68,7 @@ def isValid(text):
             u"不再播放这首歌",
             u"下载",
             u"下载这首歌",
+            u"结束豆瓣电台",
         ]
 
     res = any(word in text for word in valid_words)

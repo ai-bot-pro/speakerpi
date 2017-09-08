@@ -29,7 +29,7 @@ class RingBuffer(object):
 
 class RawTextMic:
     '''
-    命令行文字输入代替语音输入（测试调试使用)
+    命令行文字输入代替语音输入（测试调试使用,语音识别太费（¯﹃¯）口水)
     '''
     def __init__(self):
         pass
