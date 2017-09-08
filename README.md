@@ -30,3 +30,8 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 1. 歌曲名称中如果有日文，语音识别率很低，几乎识别不了。(尝试用pockectsphinx训练下，貌似语料字典不足啊，只能yy,或者找下支持日语的语音接口)
 2. 豆瓣的用户名和密码是放在本地配置中，容易泄露，可以想办法通过手机端蓝牙连接登陆（pi上的蓝牙不知道是否支持连接端和被连接端(因为用蓝牙speacker的话，以连接端接入，如果是通过手机接入，以被连接端接入),有点想小米的智能终端控制了哈,它是一站式的，因为这个调用多家服务，登陆体系多家哈，后续整个auth服务）
 
+***参考链接***
+1. [init系统介绍](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html)
+2. [snowboy](http://docs.kitt.ai/snowboy/)
+3. [jtbot](https://github.com/ibmtjbot/tjbot)
+4. [jasper-client](https://github.com/jasperproject/jasper-client)
