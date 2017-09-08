@@ -3,9 +3,23 @@
 import os
 import logging
 import yaml
+import re
 
 from lib.voice.baseVoice import AbstractVoiceEngine
 import lib.appPath
+
+def filt_punctuation(text):
+    """
+    过滤中英文标点符号,返回unicode码
+    """
+    from zhon.hanzi import punctuation
+    hanzi_punc = punctuation
+    from string import punctuation
+    en_punc = punctuation
+    punctuation = hanzi_punc + en_punc
+
+    res = re.sub(ur"[%s]+" %punctuation, "", text.decode("utf-8"))
+    return res
 
 def init_logger(name=""):
     """

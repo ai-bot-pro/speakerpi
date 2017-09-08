@@ -232,7 +232,6 @@ class Mic:
             THRESHOLD = self.fetchThreshold()
 
         if speak_callback is not None:
-            print(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
             speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
 
         # prepare recording stream
@@ -263,7 +262,6 @@ class Mic:
                 break
 
         if speak_callback is not None:
-            print(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/dong.wav"))
             speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/dong.wav"))
 
         # save the audio data

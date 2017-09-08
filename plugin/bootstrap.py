@@ -1,4 +1,5 @@
 # -*- coding: utf-8-*-
+import os
 import pkgutil
 
 import lib.appPath
@@ -13,43 +14,39 @@ class Bootstrap(object):
         self._logger = lib.util.init_logger(__name__)
         self.speaker = speaker
         self.config = config
-        self.plugins = []
+        self.plugins = self.get_plugins(config)
 
     @classmethod
-    def get_plugins(self,config):
+    def get_plugins(cls,config):
         """
         通过引导配置获取插件模块，通过插件模块中的PRIORITY属性控制优先级，按大到小排序，越大越优先
         """
         plugins = []
         locations = []
         tags = []
+        logger = lib.util.init_logger(__name__)
         if "plugins" in config:
             for (cate,plugin_tags) in config['plugins'].items():
                 locations.append(os.path.join(lib.appPath.PLUGIN_PATH,cate))
                 tags.append(plugin_tags)
 
-        self._logger.debug("Looking for plugins in: %s", ', '.join(["'%s'" % location for location in locations]))
-        self._logger.debug("Looking for tags : %s", ','.join(tags))
-
         tags = ','.join(tags).split(',')
 
         for finder, name, ispkg in pkgutil.walk_packages(locations):
             try:
-                loader = finder.find_plugin(name)
-                plugin = loader.load_plugin(name)
+                loader = finder.find_module(name)
+                plugin = loader.load_module(name)
             except:
-                self._logger.warning("Skipped plugin '%s' due to an error.", name, exc_info=True)
+                logger.warning("Skipped plugin '%s' due to an error.", name, exc_info=True)
             else:
                 if ( (hasattr(plugin, 'isValid')) and (hasattr(plugin, 'handle')) 
                         and (hasattr(plugin, 'TAG')) and (plugin.TAG in tags) ):
-                    self._logger.debug("Found plugin '%s' with tag: %r", name, plugin.TAG)
-                    plugins.append(mod)
+                    logger.debug("Found plugin '%s' with tag: %r", name, plugin.TAG)
+                    plugins.append(plugin)
                 else:
-                    self._logger.warning("Skipped plugin '%s' because it misses " + "the TAG constant.", name)
+                    logger.warning("Skipped plugin '%s' because it misses " + "the TAG constant.", name)
 
         plugins.sort(key=lambda mod: mod.PRIORITY if hasattr(mod, 'PRIORITY') else 0, reverse=True)
-
-        self.plugins = plugins
 
         return plugins
 
@@ -59,6 +56,8 @@ class Bootstrap(object):
         """
         for plugin in self.plugins:
             for text in texts:
+                self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
+                text = lib.util.filt_punctuation(text)
                 if plugin.isValid(text):
                     self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.__name__)
                     try:

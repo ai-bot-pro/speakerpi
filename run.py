@@ -5,7 +5,6 @@ import os
 import yaml
 import argparse
 import logging
-import signal
 
 from lib.voice.baiduVoice import BaiduVoice
 from lib.voice.snowboyVoice import SnowboyVoice
@@ -17,6 +16,21 @@ from plugin.fm.doubanFM import DoubanFM
 import plugin.fm.doubanFM
 from lib.conversation import Conversation
 
+import signal
+
+interrupted = False
+
+def signal_handler(signal, frame):
+    global interrupted
+    interrupted = True
+
+def interrupt_callback():
+    global interrupted
+    return interrupted
+
+# capture SIGINT signal, e.g., Ctrl+C
+signal.signal(signal.SIGINT, signal_handler)
+
 parser = argparse.ArgumentParser(description='doubanFM pi')
 parser.add_argument('--debug', action='store_true',
                     help='Show debug messages')
@@ -26,7 +40,6 @@ logging.basicConfig(stream=sys.stdout)
 logger = logging.getLogger("")
 if args.debug:
     logger.setLevel(logging.DEBUG)
-
 
 def run(robot_name="ROBOT"):
     global logger
@@ -41,7 +54,7 @@ def run(robot_name="ROBOT"):
         with open(bootstrap_file, "r") as f:
             bootstrap_config = yaml.safe_load(f)
     except OSError:
-        self._logger.error("Can't open config file: '%s'", bootstrap_file)
+        logger.error("Can't open config file: '%s'", bootstrap_file)
         raise
        
     #语音唤醒实例
@@ -79,7 +92,7 @@ def run(robot_name="ROBOT"):
             bootstrap_config)
 
     #开始交互
-    conversation.handleForever()
+    conversation.handleForever(interrupt_check=interrupt_callback)
 
 def debugDoubanFm():
     baidu_voice = BaiduVoice.get_instance()
@@ -93,7 +106,7 @@ def debugDoubanFm():
 if __name__ == '__main__':
 
     #debugDoubanFm()
-    run('xiaowu')
+    run('weedge')
 
 
 

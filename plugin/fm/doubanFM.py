@@ -55,7 +55,20 @@ def handle(text,speacker):
 
 def isValid(text):
     global interrupted
-    res = any(word in text for word in ["播放豆瓣电台","下一首", "暂停","播放","喜欢这首歌","不喜欢这首歌","删除这首歌","不再播放这首歌","下载","下载这首歌"])
+    valid_words = [
+            u"播放豆瓣电台",
+            u"下一首", 
+            u"暂停",
+            u"播放",
+            u"喜欢这首歌",
+            u"不喜欢这首歌",
+            u"删除这首歌",
+            u"不再播放这首歌",
+            u"下载",
+            u"下载这首歌",
+        ]
+
+    res = any(word in text for word in valid_words)
     if res is True: interrupted = False
     return res
 

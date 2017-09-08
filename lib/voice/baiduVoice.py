@@ -74,7 +74,7 @@ class BaiduVoice(AbstractVoiceEngine):
         transcribed = []
         if 'result' in dict_data:
             text = dict_data['result'][0].encode('utf-8')
-            transcribed.append(text.upper())
+            transcribed.append(text)
             self._logger.info('百度语音识别到了: %s', text)
         return transcribed
 

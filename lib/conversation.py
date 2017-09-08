@@ -16,9 +16,12 @@ class Conversation(object):
         self.bootstrap_config = bootstrap_config
         self.bootstrap = Bootstrap(speaker, bootstrap_config)
 
-    def handleForever(self):
+    def handleForever(self,interrupt_check=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
         while True:
+            if interrupt_check is not None:
+                if interrupt_check(): break
+
             self._logger.debug("Started to listen kw : %s", self.robot_name)
             threshold, transcribed = self.mic.passiveListen(self.robot_name,
                     transcribe_callback=self.passive_stt.transcribe)
@@ -36,7 +39,6 @@ class Conversation(object):
             self._logger.debug("Stopped to listen actively with threshold: %r", threshold)
 
             if input:
-                self._logger.debug("Started to bootstrap asr word to plunins with input: %s", input)
                 self.bootstrap.query(input)
             else:
                 self.speaker.say("没听清楚，请再说一次")
