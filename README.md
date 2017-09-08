@@ -35,3 +35,5 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 2. [snowboy](http://docs.kitt.ai/snowboy/)
 3. [jtbot](https://github.com/ibmtjbot/tjbot)
 4. [jasper-client](http://jasperproject.github.io/documentation/)
+5. [pocketsphix](https://cmusphinx.github.io/wiki/tutorialpocketsphinx/)
+
