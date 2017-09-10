@@ -4,6 +4,7 @@ import sys
 import os
 import json
 import requests
+import tempfile
 
 import yaml
 
@@ -61,10 +62,12 @@ class BaiduVoice(AbstractVoiceEngine):
         result  = self._aipSpeech.synthesis(phrase, 'zh', 1, { 'per':self._per,'vol': 5, })
         # 识别正确返回语音二进制 错误则返回dict 参照http://yuyin.baidu.com/docs/tts/196 错误码
         if not isinstance(result, dict):
-            with open(self._output_file, 'wb') as f:
+            with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as f:
                 f.write(result)
-        self.play(self._output_file)
-        os.remove(self._output_file)
+                tmpfile = f.name
+        #使用临时文件创建，防止多个进程操作一个文件
+        self.play(tmpfile)
+        os.remove(tmpfile)
 
     def transcribe(self,fp):
         fp.seek(0)

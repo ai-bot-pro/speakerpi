@@ -1,11 +1,13 @@
 # -*- coding: utf-8-*-
 
-import sys
-import os
+import sys, os, time, random
+import re
+
 import yaml
 import argparse
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Pipe
+import psutil
 
 from lib.voice.baiduVoice import BaiduVoice
 from lib.voice.snowboyVoice import SnowboyVoice
@@ -16,6 +18,7 @@ import lib.util
 from plugin.fm.doubanFM import DoubanFM
 import plugin.fm.doubanFM
 from lib.conversation import Conversation
+from plugin.bootstrap import Bootstrap
 
 import signal
 
@@ -32,18 +35,7 @@ def interrupt_callback():
 # capture SIGINT signal, e.g., Ctrl+C
 signal.signal(signal.SIGINT, signal_handler)
 
-parser = argparse.ArgumentParser(description='doubanFM pi')
-parser.add_argument('--debug', action='store_true',
-                    help='Show debug messages')
-args = parser.parse_args()
-
-logging.basicConfig(stream=sys.stdout)
-logger = logging.getLogger("")
-if args.debug:
-    logger.setLevel(logging.DEBUG)
-
-def run(robot_name="ROBOT"):
-    global logger
+def run(robot_name="ROBOT",logger=None):
     bootstrap_file = os.path.join(lib.appPath.CONFIG_PATH, 'bootstrap.yml')
     if os.path.exists(bootstrap_file) is False:
         logger.error("bootstrap file is not exists!")
@@ -97,7 +89,8 @@ def run(robot_name="ROBOT"):
             bootstrap_config)
 
     #开始交互
-    #conversation.handleForever(interrupt_check=interrupt_callback)
+    conversation.handleForever(interrupt_check=interrupt_callback)
+    '''
     queue = Queue()
     conversation_process = Process(target=conversation.handleForever,args=(interrupt_callback,queue,))
     bootstrap_process = Process(target=bootstrap.query,args=(queue,))
@@ -105,20 +98,65 @@ def run(robot_name="ROBOT"):
     bootstrap_process.start()
     conversation_process.join()
     bootstrap_process.join()
+    '''
 
-def debugDoubanFm():
+def debugDoubanFm(logger=None):
     baidu_voice = BaiduVoice.get_instance()
-    text = "播放豆瓣电台"
-    is_valid = plugin.fm.doubanFM.isValid(text)
-    if is_valid is True:
-        plugin.fm.doubanFM.handle(text,baidu_voice)
 
-        
+    out_pipe, in_pipe = Pipe(True)
+    
+    son_p = Process(target=Bootstrap.son_process, 
+                args=(baidu_voice, (out_pipe, in_pipe),
+                plugin.fm.doubanFM.son_process_handle))
+
+    son_p.start()
+
+    # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
+    out_pipe.close()
+
+    debug_words = [
+            u"播放豆瓣电台",
+            #u"下一首", 
+            #u"暂停",
+            #u"继续播放",
+            #u"喜欢这首歌",
+            #u"不喜欢这首歌",
+            #u"删除这首歌",
+            #u"不再播放这首歌",
+            #u"下载",
+            #u"下载这首歌",
+            #u"结束豆瓣电台",
+        ]
+
+    for text in debug_words:
+        is_valid = plugin.fm.doubanFM.isValid(text)
+        if is_valid is True:
+            plugin.fm.doubanFM.send_handle(text,in_pipe,son_p)
+        else:
+            print("word %s is not valid" % text)
+
+    in_pipe.close()
+    son_p.join()
+    print "debug doubanFM son process with pipe is over"
+
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='doubanFM pi')
+    parser.add_argument('--debug', action='store_true',
+                        help='Show debug messages')
+    parser.add_argument('--debugDoubanFmPlugin', action='store_true',
+                        help='Show debug douban fm plugin messages')
+    args = parser.parse_args()
+    
+    logging.basicConfig(stream=sys.stdout)
+    logger = logging.getLogger("")
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
 
-    #debugDoubanFm()
-    run('weedge')
+    if args.debugDoubanFmPlugin:
+        debugDoubanFm(logger)
+    else:
+        run('weedge',logger)
 
 
 

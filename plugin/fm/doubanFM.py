@@ -48,12 +48,47 @@ def dispatch_command_callback(text):
     if re.search(u'结束豆瓣电台', text): interrupted = True
     return command
 
-def handle(text,speacker):
-    if text == u"播放豆瓣电台":
-        speacker.say("开始播放豆瓣电台")
+def son_process_handle(out_fp,speaker):
+    '''
+    子进程处理逻辑
+    out_fp: 子进程pipe 输出端
+    speaker: voice实例(tts)
+    '''
+    print("<<<<<<< begin douban fm son process handle >>>>>>>")
     douban_fm = DoubanFM.get_instance()
-    douban_fm.set_speaker(speacker)
-    douban_fm.start(text=text,interrupt_check=interrupt_callback,play_command_callback=dispatch_command_callback,sleep_time=0.05)
+    douban_fm.set_speaker(speaker)
+    douban_fm.start(get_text_callback=out_fp.recv,
+            interrupt_check=interrupt_callback,
+            play_command_callback=dispatch_command_callback,
+            sleep_time=0.05)
+
+def send_handle(text,in_fp,son_processor=None):
+    '''
+    发送指令给子进程处理(pipe,signal)
+    text: 指令
+    in_fp: pipe 输入端
+    son_processor: 子进程(Process 实例)
+    '''
+    print("<<<<<<< begin douban fm send pipe handle >>>>>>>")
+    if  any(word not in text for word in [u'暂停',u'继续播放']):
+        print("send valid word %s to pipe" % text)
+        in_fp.send(text)
+    if re.search(u'播放豆瓣电台', text):
+        time.sleep(60)
+    #父进程调用系统发信号给子进程
+    if re.search(u'下一首', text) or re.search(u'删除', text) or re.search(u'不再播放', text):
+        DoubanFM.kill_mplay_procsss()
+        time.sleep(30)
+    if re.search(u'暂停', text):
+        DoubanFM.suspend_mplay_process()
+        time.sleep(10)
+    if re.search(u'继续播放', text):
+        DoubanFM.resume_mplay_process()
+        time.sleep(30)
+    if re.search(u'结束豆瓣电台', text):
+        DoubanFM.kill_mplay_procsss()
+        son_processor.terminate()
+        #os.kill(son_p.pid,9)
 
 def isValid(text):
     global interrupted
@@ -75,14 +110,15 @@ def isValid(text):
     if res is True: interrupted = False
     return res
 
+
 class DoubanFM(AbstractFM):
 
     def is_available(cls):
         return (super(cls, cls).is_available() and
                 lib.diagnose.check_network_connection('www.douban.com'))
 
-    def set_speaker(self,speacker):
-        self.speacker = speacker
+    def set_speaker(self,speaker):
+        self.speaker = speaker
 
     def __init__(self, account_id, password, douban_id=None,
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
@@ -300,16 +336,24 @@ class DoubanFM(AbstractFM):
 
     def playNextBanSong(self):
         self._logger.debug("douban fm play next ban song")
-        if self._mplay_process.pid is not None:
+        '''
+        if self._mplay_process is not None and self._mplay_process.pid>0:
+            #已经在父进程通过信号结束了self._mplay_process.pid,子进程还保留这份数据，所以无需在执行
+            pass
             self._mplay_process.kill()
+        '''
         sid = self._getSidFromLocal()
         self.getSong(type='b',sid=sid)
         self.playSong()
 
     def playNextActionSong(self):
         self._logger.debug("douban fm play next action song")
-        if self._mplay_process.pid is not None:
+        '''
+        if self._mplay_process is not None and self._mplay_process.pid>0:
+            #已经在父进程通过信号结束了self._mplay_process.pid,子进程还保留这份数据，所以无需在执行
+            pass
             self._mplay_process.kill()
+        '''
         sid = self._getSidFromLocal()
         self.getSong(type='p',sid=sid)
         self.playSong()
@@ -331,9 +375,11 @@ class DoubanFM(AbstractFM):
         """
         res = None
         self._logger.debug("douban fm stop playing song")
-        if self._mplay_process.pid is not None:
+        '''
+        if self._mplay_process is not None and self._mplay_process.pid>0:
             self._logger.debug("pid: %d",self._mplay_process.pid)
             res = psutil.Process(self._mplay_process.pid).suspend()
+        '''
 
         return res
     
@@ -343,9 +389,11 @@ class DoubanFM(AbstractFM):
         """
         res = None
         self._logger.debug("douban fm continue to play song")
-        if self._mplay_process.pid is not None:
+        '''
+        if self._mplay_process is not None and self._mplay_process.pid>0:
             self._logger.debug("pid: %d",self._mplay_process.pid)
             res = psutil.Process(self._mplay_process.pid).resume()
+        '''
         return res
 
     def playSong(self):
@@ -358,13 +406,13 @@ class DoubanFM(AbstractFM):
                 artist = song['artist'].encode('UTF-8')
                 region = song['singers'][0]['region'][0].encode('UTF-8')
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
-                self.speacker.say(singer_info)
+                self.speaker.say(singer_info)
                 self.mplay(url)
             except IndexError:
                 self._logger.error("播放%s 失败",url)
                 pass
 
-    def start(self, text, play_command_callback=None,
+    def start(self, get_text_callback, play_command_callback=None,
               interrupt_check=lambda: False,
               sleep_time=0.03):
         
@@ -375,6 +423,14 @@ class DoubanFM(AbstractFM):
                 break
             if play_command_callback is not None:
                 time.sleep(sleep_time)
+                try:
+                    text = get_text_callback()
+                except EOFError:
+                    # 当out_pipe接受不到输出的时候且输入被关闭的时候，会抛出EORFError，可以捕获并且播放下首
+                    self._logger.debug("-----no instructions in pipe,continue to play next song------")
+                    self.playNextSong()
+                    continue 
+                self.speaker.say(text)
                 command = play_command_callback(text)
                 operator = {
                     "p": self.playNextSong,
@@ -382,12 +438,12 @@ class DoubanFM(AbstractFM):
                     "r": self.playNextLikeSong,
                     "u": self.playNextUnLikeSong,
                     "b": self.playNextBanSong,
-                    "stop": self.stopSong,
+                    #"stop": self.stopSong,
                 }
                 if operator.has_key(command):
                     operator[command]()
                 else:
-                    self.playNextSong()
+                    continue
 
         self._logger.debug("douban fm over")
 
