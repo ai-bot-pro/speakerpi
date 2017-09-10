@@ -33,6 +33,7 @@ def interrupt_callback():
 signal.signal(signal.SIGINT, signal_handler)
 
 TAG = 'douban'
+CATE = 'fm'
 
 def dispatch_command_callback(text):
     global interrupted
@@ -73,22 +74,22 @@ def send_handle(text,in_fp,son_processor=None):
     if  any(word not in text for word in [u'暂停',u'继续播放']):
         print("send valid word %s to pipe" % text)
         in_fp.send(text)
-    if re.search(u'播放豆瓣电台', text):
-        time.sleep(60)
     #父进程调用系统发信号给子进程
     if re.search(u'下一首', text) or re.search(u'删除', text) or re.search(u'不再播放', text):
         DoubanFM.kill_mplay_procsss()
-        time.sleep(30)
+        time.sleep(3)
     if re.search(u'暂停', text):
         DoubanFM.suspend_mplay_process()
-        time.sleep(10)
+        time.sleep(1)
     if re.search(u'继续播放', text):
         DoubanFM.resume_mplay_process()
-        time.sleep(30)
+        time.sleep(1)
     if re.search(u'结束豆瓣电台', text):
         DoubanFM.kill_mplay_procsss()
         son_processor.terminate()
-        #os.kill(son_p.pid,9)
+        #os.kill(son_processor.pid,9)
+        pid_file = os.path.join(lib.appPath.DATA_PATH, __name__+'.pid');
+        os.remove(pid_file)
 
 def isValid(text):
     global interrupted
@@ -422,7 +423,6 @@ class DoubanFM(AbstractFM):
                 self._logger.debug("douban fm break")
                 break
             if play_command_callback is not None:
-                time.sleep(sleep_time)
                 try:
                     text = get_text_callback()
                 except EOFError:

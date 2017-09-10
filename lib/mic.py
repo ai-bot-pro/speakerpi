@@ -38,10 +38,10 @@ class RawTextMic:
         return True,detected_word
 
     def activeListenToAllOptions(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None):
-        return [activeListen(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None)]
+        return [self.activeListen(THRESHOLD, speak_callback, transcribe_callback)]
 
     def activeListen(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None):
-        input = raw_input("YOU: ")
+        input = raw_input("YOU SAY: ")
         return input
 
 class Mic:
@@ -220,7 +220,7 @@ class Mic:
         """
             Records until a second of silence or times out after 12 seconds
 
-            Returns a list of the matching options or None
+            Returns a list of the matching options or empty list
         """
 
         RATE = 16000

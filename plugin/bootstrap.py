@@ -1,6 +1,8 @@
 # -*- coding: utf-8-*-
 import os
+import re
 import pkgutil
+from multiprocessing import Process, Queue, Pipe
 
 import lib.appPath
 import lib.util
@@ -18,14 +20,28 @@ class Bootstrap(object):
 
         self.son_processors = {}
         self.in_fps = {}
+        '''
         for plugin in self.plugins:
-            out_fp, in_fp = Pipe(True)
-            son_process = Process(target=self.son_process, args=(speaker,(out_fp, in_fp), plugin.son_process_handle))
-            son_process.start()
-            # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
-            out_fp.close()
-            self.son_processors[plugin.TAG] = son_process
-            self.in_fps[plugin.TAG] = in_fp
+            self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin)
+        '''
+
+    @classmethod
+    def create_plugin_process(cls,plugin,speaker): 
+        print(str(os.getpid()))
+        out_fp, in_fp = Pipe(True)
+        son_processor = Process(target=cls.son_process, args=(speaker,(out_fp, in_fp), plugin.son_process_handle))
+        # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
+        son_processor.start()
+        out_fp.close()
+
+        print(son_processor.pid)
+        #其实直接可以通过son_processor.pid来判断是否进程还在，写入文件主要是方便查看当前运行的插件进程
+        pid_file = os.path.join(lib.appPath.DATA_PATH,plugin.__name__+".pid")
+        with open(pid_file, 'w') as pid_fp:
+            pid_fp.write(str(son_processor.pid))
+            pid_fp.close()
+
+        return [son_processor,in_fp]
 
     @classmethod
     def son_process(cls, speaker, pipe, handle_callback=None):
@@ -39,6 +55,12 @@ class Bootstrap(object):
         if handle_callback is not None:
             handle_callback(_out_fp,speaker)
 
+    def __del__(self):
+        self._logger.debug("______ delete bootstrap ______")
+        for (plugin_tags,son_processor) in self.son_processors.items():
+            self.in_fps[plugin_tags].close()
+            son_processor.join()
+
     @classmethod
     def get_plugins(cls,config):
         """
@@ -47,11 +69,13 @@ class Bootstrap(object):
         plugins = []
         locations = []
         tags = []
+        cates = []
         logger = lib.util.init_logger(__name__)
         if "plugins" in config:
             for (cate,plugin_tags) in config['plugins'].items():
                 locations.append(os.path.join(lib.appPath.PLUGIN_PATH,cate))
                 tags.extend(plugin_tags.keys())
+                cates.append(cate)
 
         tags = list(set(tags))
 
@@ -65,7 +89,8 @@ class Bootstrap(object):
                 if ( (hasattr(plugin, 'isValid')) 
                     and (hasattr(plugin, 'send_handle')) 
                     and (hasattr(plugin, 'son_process_handle')) 
-                    and (hasattr(plugin, 'TAG')) and (plugin.TAG in tags) ):
+                    and (hasattr(plugin, 'TAG')) and (plugin.TAG in tags) 
+                    and (hasattr(plugin, 'CATE')) and (plugin.CATE in cates) ):
                     logger.debug("Found plugin '%s' with tag: %r", name, plugin.TAG)
                     plugins.append(plugin)
                 else:
@@ -75,22 +100,34 @@ class Bootstrap(object):
 
         return plugins
 
-    def query(self, queue=None):
+    def query(self,texts,queue=None):
         """
         引导识别的texts给对应的插件处理
         """
-        texts = queue.get(True)
+        if queue is not None:
+            texts = queue.get(True)
+
         for plugin in self.plugins:
             for text in texts:
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
                 text = lib.util.filt_punctuation(text)
-                if plugin.isValid(text):
+
+                if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
+                    begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
+                    if re.search(begin_instrunction, text) and self.getPluginPid(plugin) is None:
+                        self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
+                        self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
+                        continue
+                            
+                if (plugin.isValid(text)
+                        and self.in_fps[plugin.TAG]
+                        and self.son_processors[plugin.TAG]
+                        and self.getPluginPid(plugin) == self.son_processors[plugin.TAG].pid):
                     self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.__name__)
                     try:
-                        self._logger.debug("send valid word %s to pipe for %s", text, plugin.__name__)
-                        in_fp = self.in_fps[plugin.Tag]
-                        son_processor = self.son_processors[plugin.Tag]
-                        plugin.send_handle(text, in_fp,son_processor)
+                        in_fp = self.in_fps[plugin.TAG]
+                        son_processor = self.son_processors[plugin.TAG]
+                        plugin.send_handle(text,in_fp,son_processor)
                     except Exception:
                         self._logger.error('Failed to send valid word %s to pipe for %s', text,plugin.__name__,exc_info=True)
                         #self.speaker.say("遇到一些麻烦，请重试一次")
@@ -100,6 +137,12 @@ class Bootstrap(object):
                         return
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
 
-    def checkSonProcessIsOver(cls,tag):
-        pass
-            
+        
+    @classmethod
+    def getPluginPid(cls,plugin):
+        pid = None 
+        pid_path = os.path.join(lib.appPath.DATA_PATH, plugin.__name__+'.pid');
+        if os.path.exists(pid_path):
+            with open(pid_path,"r") as f:
+                pid = int(f.read())
+        return pid 

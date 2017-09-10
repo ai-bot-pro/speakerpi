@@ -16,7 +16,7 @@ class Conversation(object):
         self.active_stt = active_stt
         self.passive_stt = passive_stt
         self.bootstrap_config = bootstrap_config
-        #self.bootstrap = Bootstrap(speaker, bootstrap_config)
+        self.bootstrap = Bootstrap(speaker, bootstrap_config)
 
     def handleForever(self,interrupt_check=None,queue=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
@@ -39,10 +39,15 @@ class Conversation(object):
             input = self.mic.activeListenToAllOptions(threshold,
                     speak_callback=self.speaker.play,
                     transcribe_callback=self.active_stt.transcribe)
-            self._logger.debug("Stopped to listen actively with threshold: %r", threshold)
-
-            if input and queue is not None:
-                queue.put(input)
-                #self.bootstrap.query(input)
+            self._logger.debug("Stopped to listen actively with threshold: %r and input: %s", threshold, input)
+            if input :
+                if queue is not None:
+                    #将识别的指令发到Queue中，由其他进程处理
+                    # (todo:由bootstrap引导进程处理,通过pipe分发给plugin进程,
+                    #  前提需要一个daemon进程fork2个进程:1.conversation会话进程，2.bootstrap引导进程)
+                    queue.put(input)
+                else:
+                    #直接将识别的指令发给bootstrap引导模块处理
+                    self.bootstrap.query(input)
             else:
                 self.speaker.say("没听清楚，请再说一次")

@@ -35,7 +35,7 @@ def interrupt_callback():
 # capture SIGINT signal, e.g., Ctrl+C
 signal.signal(signal.SIGINT, signal_handler)
 
-def run(robot_name="ROBOT",logger=None):
+def run(robot_name="ROBOT",logger=None,args=None):
     bootstrap_file = os.path.join(lib.appPath.CONFIG_PATH, 'bootstrap.yml')
     if os.path.exists(bootstrap_file) is False:
         logger.error("bootstrap file is not exists!")
@@ -75,7 +75,7 @@ def run(robot_name="ROBOT",logger=None):
     speak_engine_class = lib.util.get_engine_by_tag(speak_engine_tag)
     
     #语音录入实例
-    mic = Mic()
+    mic = RawTextMic() if args.debug else Mic()
     
     #会话(指令)初始
     conversation = Conversation(robot_name, mic, 
@@ -84,12 +84,13 @@ def run(robot_name="ROBOT",logger=None):
             passive_stt_engine_class.get_instance(),
             bootstrap_config)
 
-    #插件引导初始
-    bootstrap = Bootstrap(speak_engine_class.get_instance(),
-            bootstrap_config)
 
     #开始交互
     conversation.handleForever(interrupt_check=interrupt_callback)
+
+    #插件引导初始
+    #bootstrap = Bootstrap(speak_engine_class.get_instance(), bootstrap_config)
+
     '''
     queue = Queue()
     conversation_process = Process(target=conversation.handleForever,args=(interrupt_callback,queue,))
@@ -100,7 +101,7 @@ def run(robot_name="ROBOT",logger=None):
     bootstrap_process.join()
     '''
 
-def debugDoubanFm(logger=None):
+def debugDoubanFm(logger=None,args=None):
     baidu_voice = BaiduVoice.get_instance()
 
     out_pipe, in_pipe = Pipe(True)
@@ -154,9 +155,9 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
 
     if args.debugDoubanFmPlugin:
-        debugDoubanFm(logger)
+        debugDoubanFm(logger,args)
     else:
-        run('weedge',logger)
+        run('weedge',logger,args)
 
 
 
