@@ -20,10 +20,11 @@ class Bootstrap(object):
 
         self.son_processors = {}
         self.in_fps = {}
-        '''
         for plugin in self.plugins:
-            self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin)
-        '''
+            pid_file = os.path.join(lib.appPath.DATA_PATH, plugin.__name__+'.pid');
+            if os.path.exists(pid_file):
+                os.remove(pid_file)
+            self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,speaker)
 
     @classmethod
     def create_plugin_process(cls,plugin,speaker): 
@@ -41,6 +42,7 @@ class Bootstrap(object):
             pid_fp.write(str(son_processor.pid))
             pid_fp.close()
 
+        print([son_processor,in_fp])
         return [son_processor,in_fp]
 
     @classmethod
@@ -112,22 +114,23 @@ class Bootstrap(object):
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
                 text = lib.util.filt_punctuation(text)
 
+                '''
                 if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
                     begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
                     if re.search(begin_instrunction, text) and self.getPluginPid(plugin) is None:
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
-                        continue
+                '''
                             
                 if (plugin.isValid(text)
-                        and self.in_fps[plugin.TAG]
-                        and self.son_processors[plugin.TAG]
+                        and plugin.TAG in self.in_fps
+                        and plugin.TAG in self.son_processors
                         and self.getPluginPid(plugin) == self.son_processors[plugin.TAG].pid):
                     self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.__name__)
                     try:
                         in_fp = self.in_fps[plugin.TAG]
                         son_processor = self.son_processors[plugin.TAG]
-                        plugin.send_handle(text,in_fp,son_processor)
+                        plugin.send_handle(text,in_fp,son_processor,self.speaker)
                     except Exception:
                         self._logger.error('Failed to send valid word %s to pipe for %s', text,plugin.__name__,exc_info=True)
                         #self.speaker.say("遇到一些麻烦，请重试一次")

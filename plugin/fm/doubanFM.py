@@ -63,15 +63,16 @@ def son_process_handle(out_fp,speaker):
             play_command_callback=dispatch_command_callback,
             sleep_time=0.05)
 
-def send_handle(text,in_fp,son_processor=None):
+def send_handle(text,in_fp,son_processor,speaker):
     '''
     发送指令给子进程处理(pipe,signal)
     text: 指令
     in_fp: pipe 输入端
     son_processor: 子进程(Process 实例)
+    speaker: voice实例(tts)
     '''
     print("<<<<<<< begin douban fm send pipe handle >>>>>>>")
-    if  any(word not in text for word in [u'暂停',u'继续播放']):
+    if all(word not in text for word in [u'暂停',u'继续播放']):
         print("send valid word %s to pipe" % text)
         in_fp.send(text)
     #父进程调用系统发信号给子进程
@@ -80,16 +81,20 @@ def send_handle(text,in_fp,son_processor=None):
         time.sleep(3)
     if re.search(u'暂停', text):
         DoubanFM.suspend_mplay_process()
+        speaker.say(text)
         time.sleep(1)
     if re.search(u'继续播放', text):
         DoubanFM.resume_mplay_process()
+        speaker.say(text)
         time.sleep(1)
     if re.search(u'结束豆瓣电台', text):
         DoubanFM.kill_mplay_procsss()
+        in_fp.close()
         son_processor.terminate()
-        #os.kill(son_processor.pid,9)
+        #os.kill(son_processor.pid,signal.SIGTERM)
         pid_file = os.path.join(lib.appPath.DATA_PATH, __name__+'.pid');
-        os.remove(pid_file)
+        if os.path.exists(pid_file):
+            os.remove(pid_file)
 
 def isValid(text):
     global interrupted
@@ -120,6 +125,13 @@ class DoubanFM(AbstractFM):
 
     def set_speaker(self,speaker):
         self.speaker = speaker
+
+    '''
+    def __del__(self):
+        self._logger.debug("______ delete douban fm ______")
+        pid_file = os.path.join(lib.appPath.DATA_PATH, self.__name__+'.pid');
+        os.remove(pid_file)
+    '''
 
     def __init__(self, account_id, password, douban_id=None,
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
@@ -424,9 +436,11 @@ class DoubanFM(AbstractFM):
                 break
             if play_command_callback is not None:
                 try:
+                    self._logger.debug("-----start get text from pipe------")
                     text = get_text_callback()
+                    self._logger.debug("-----got text %s from pipe------",text)
                 except EOFError:
-                    # 当out_pipe接受不到输出的时候且输入被关闭的时候，会抛出EORFError，可以捕获并且播放下首
+                    # 当out_pipe fd接受不到输出的时候且输入被关闭的时候，会抛出EORFError，可以捕获并且播放下首
                     self._logger.debug("-----no instructions in pipe,continue to play next song------")
                     self.playNextSong()
                     continue 

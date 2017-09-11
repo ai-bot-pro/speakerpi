@@ -1,7 +1,22 @@
 # -*- coding: utf-8-*-
+import sys, os, time, random
 import lib.util
 from plugin.bootstrap import Bootstrap
 
+import signal
+
+interrupted = False
+
+def signal_handler(signal, frame):
+    global interrupted
+    interrupted = True
+
+def interrupt_callback():
+    global interrupted
+    return interrupted
+
+# capture SIGINT signal, e.g., Ctrl+C
+signal.signal(signal.SIGINT, signal_handler)
 
 class Conversation(object):
     """
@@ -18,12 +33,13 @@ class Conversation(object):
         self.bootstrap_config = bootstrap_config
         self.bootstrap = Bootstrap(speaker, bootstrap_config)
 
-    def handleForever(self,interrupt_check=None,queue=None):
+    def handleForever(self,interrupt_check=interrupt_callback,queue=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
         self.speaker.say("hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我")
         while True:
             if interrupt_check is not None:
-                if interrupt_check(): break
+                if interrupt_check(): 
+                    break
 
             self._logger.debug("Started to listen kw : %s", self.robot_name)
             threshold, transcribed = self.mic.passiveListen(self.robot_name,

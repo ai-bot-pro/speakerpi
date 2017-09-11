@@ -86,7 +86,7 @@ def run(robot_name="ROBOT",logger=None,args=None):
 
 
     #开始交互
-    conversation.handleForever(interrupt_check=interrupt_callback)
+    conversation.handleForever()
 
     #插件引导初始
     #bootstrap = Bootstrap(speak_engine_class.get_instance(), bootstrap_config)
@@ -117,27 +117,33 @@ def debugDoubanFm(logger=None,args=None):
 
     debug_words = [
             u"播放豆瓣电台",
-            #u"下一首", 
-            #u"暂停",
-            #u"继续播放",
+            u"下一首", 
+            u"暂停",
+            u"继续播放",
             #u"喜欢这首歌",
             #u"不喜欢这首歌",
-            #u"删除这首歌",
-            #u"不再播放这首歌",
+            u"删除这首歌",
+            u"不再播放这首歌",
             #u"下载",
             #u"下载这首歌",
-            #u"结束豆瓣电台",
+            u"结束豆瓣电台",
         ]
 
     for text in debug_words:
         is_valid = plugin.fm.doubanFM.isValid(text)
         if is_valid is True:
-            plugin.fm.doubanFM.send_handle(text,in_pipe,son_p)
+            if any(word in text for word in [u'结束豆瓣电台']):
+                #再睡6分钟是为了判断中间是否自然播放下首歌曲;然后在发送结束指令
+                time.sleep(360)
+            plugin.fm.doubanFM.send_handle(text,in_pipe,son_p,baidu_voice)
+            #睡的时间尽量在30秒左右以上，因为子进程还在处理中，还未产生播放歌曲的进程id
+            time.sleep(30)
         else:
             print("word %s is not valid" % text)
 
     in_pipe.close()
     son_p.join()
+
     print "debug doubanFM son process with pipe is over"
 
 
