@@ -108,7 +108,7 @@ def debugDoubanFm(logger=None,args=None):
     
     son_p = Process(target=Bootstrap.son_process, 
                 args=(baidu_voice, (out_pipe, in_pipe),
-                plugin.fm.doubanFM.son_process_handle))
+                plugin.fm.doubanFM.son_process_handle,False))
 
     son_p.start()
 
@@ -133,11 +133,15 @@ def debugDoubanFm(logger=None,args=None):
         is_valid = plugin.fm.doubanFM.isValid(text)
         if is_valid is True:
             if any(word in text for word in [u'结束豆瓣电台']):
-                #再睡6分钟是为了判断中间是否自然播放下首歌曲;然后在发送结束指令
+                #再睡6分钟是为了判断中间是否自然播放下首歌曲;然后在发送结束指令(unblock is ok)
                 time.sleep(360)
+
             plugin.fm.doubanFM.send_handle(text,in_pipe,son_p,baidu_voice)
-            #睡的时间尽量在30秒左右以上，因为子进程还在处理中，还未产生播放歌曲的进程id
-            time.sleep(30)
+
+            if any(word in text for word in [u'结束豆瓣电台']): break
+
+            #睡的时间尽量在30秒左右以上，因为子进程还在处理中（speaker的话比较多得时候），还未产生播放歌曲的进程id
+            time.sleep(60)
         else:
             print("word %s is not valid" % text)
 

@@ -58,6 +58,7 @@ class BaiduVoice(AbstractVoiceEngine):
                 lib.diagnose.check_network_connection('www.baidu.com'))
 
     def say(self, phrase):
+        if not phrase: return False
         self._logger.debug("Saying '%s' with '%s'", phrase, self.TAG)
         result  = self._aipSpeech.synthesis(phrase, 'zh', 1, { 'per':self._per,'vol': 5, })
         # 识别正确返回语音二进制 错误则返回dict 参照http://yuyin.baidu.com/docs/tts/196 错误码

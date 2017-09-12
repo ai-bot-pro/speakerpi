@@ -46,19 +46,19 @@ def dispatch_command_callback(text):
     if re.search(u'不再播放', text): command = "b"
     if re.search(u'暂停', text): command = "stop"
     if re.search(u'继续播放', text): command = "continue"
-    if re.search(u'结束豆瓣电台', text): interrupted = True
+    if re.search(u'结束豆瓣电台', text): command = "exit"
     return command
 
-def son_process_handle(out_fp,speaker):
+def son_process_handle(speaker,get_text_callback):
     '''
     子进程处理逻辑
-    out_fp: 子进程pipe 输出端
     speaker: voice实例(tts)
+    get_text_callback: 获取文本指令回调函数
     '''
     print("<<<<<<< begin douban fm son process handle >>>>>>>")
     douban_fm = DoubanFM.get_instance()
     douban_fm.set_speaker(speaker)
-    douban_fm.start(get_text_callback=out_fp.recv,
+    douban_fm.start(get_text_callback=get_text_callback,
             interrupt_check=interrupt_callback,
             play_command_callback=dispatch_command_callback,
             sleep_time=0.05)
@@ -90,8 +90,8 @@ def send_handle(text,in_fp,son_processor,speaker):
     if re.search(u'结束豆瓣电台', text):
         DoubanFM.kill_mplay_procsss()
         in_fp.close()
-        son_processor.terminate()
-        #os.kill(son_processor.pid,signal.SIGTERM)
+        #相当于执行os.waitpid(son_processor.pid)等待资源回收
+        son_processor.join()
         pid_file = os.path.join(lib.appPath.DATA_PATH, __name__+'.pid');
         if os.path.exists(pid_file):
             os.remove(pid_file)
@@ -368,7 +368,7 @@ class DoubanFM(AbstractFM):
             self._mplay_process.kill()
         '''
         sid = self._getSidFromLocal()
-        self.getSong(type='p',sid=sid)
+        self.getSong(type='s',sid=sid)
         self.playSong()
 
     def playNextSong(self):
@@ -431,21 +431,30 @@ class DoubanFM(AbstractFM):
         
         self._logger.debug("douban fm start")
         while True:
-            if interrupt_check():
-                self._logger.debug("douban fm break")
-                break
-            if play_command_callback is not None:
+            if (play_command_callback is not None 
+                    and get_text_callback is not None):
                 try:
                     self._logger.debug("-----start get text from pipe------")
                     text = get_text_callback()
-                    self._logger.debug("-----got text %s from pipe------",text)
+                    if text is not None:
+                        self._logger.debug("-----got text %s from pipe------",text)
                 except EOFError:
-                    # 当out_pipe fd接受不到输出的时候且输入被关闭的时候，会抛出EORFError，可以捕获并且播放下首
-                    self._logger.debug("-----no instructions in pipe,continue to play next song------")
+                    # 当out_fd接受不到输出的时候且输入被关闭的时候，会抛出EORFError，可以捕获并且播放下首
+                    self._logger.debug("-----no instructions in pipe or pipe is close,break douban fm polling------")
+                    break
+
+                #未收到任何指令，继续自然の播放
+                if (text is None):
                     self.playNextSong()
-                    continue 
+                    continue
+
                 self.speaker.say(text)
+
                 command = play_command_callback(text)
+                if (interrupt_check()
+                    or command=='exit'):
+                    self._logger.debug("douban fm break")
+                    break
                 operator = {
                     "p": self.playNextSong,
                     "s": self.playNextActionSong,

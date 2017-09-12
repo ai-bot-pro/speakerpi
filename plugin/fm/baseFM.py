@@ -29,12 +29,18 @@ class AbstractFM(AbstractClass):
             self._mplay_process = subprocess.Popen(cmd,stdout=f,stderr=f,preexec_fn=os.setsid)
             self._logger.debug("mplayer pid: '%d'", self._mplay_process.pid)
 
+            #正在播放的时候保存mplayer pid（这个pid为进程组id)
             pid_file = os.path.join(lib.appPath.DATA_PATH,self.__class__.__name__+"_mplay.pid")
             with open(pid_file, 'w') as pid_fp:
                 pid_fp.write(str(self._mplay_process.pid))
                 pid_fp.close()
             
             self._mplay_process.wait()
+
+            #播放完删除mplayer pid 文件
+            if os.path.exists(pid_file):
+                os.remove(pid_file)
+
             f.seek(0)
             output = f.read()
             if output:
@@ -46,15 +52,16 @@ class AbstractFM(AbstractClass):
         kill当前播放的mplay进程 （进程id从文件中获取）
         '''
         pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
-        with open(pid_file, 'r') as f:
-            pid = int(f.read())
-            print("-----")
-            print(pid_file,pid)
-            print("-----")
-            f.close()
-            if pid: 
-                print("pgkill mplay pid: %d"%pid)
-                os.killpg(pid,signal.SIGTERM)
+        if os.path.exists(pid_file):
+            with open(pid_file, 'r') as f:
+                pid = int(f.read())
+                print("-----")
+                print(pid_file,pid)
+                print("-----")
+                f.close()
+                if pid: 
+                    print("pgkill mplay pid: %d"%pid)
+                    os.killpg(pid,signal.SIGTERM)
     
     @classmethod
     def suspend_mplay_process(cls):
