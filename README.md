@@ -33,7 +33,7 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 		1、唤醒进程为父进程，plugin进程为子进程，父子之间的通信适合pipe来处理,如果子进程必须block运行时，采用父进程通过系统发送信号给子进程进行中断等(SIG*)操作；  
 		2、唤醒进程和plugin进程互为兄弟进程，兄弟间进程交互选用FIFO/消息队列通信。  
 		&emsp;&emsp;其实这个可以延伸到网络IPC,分布式进程之间的通信(socket)：RPC协议框架、进程之间需要异步处理，采用分布式消息中间件Queue(p2p)/Topic(pubsub) 进行通信,有利于系统模块的解耦.  
-		&emsp;&emsp;多个进程通过pipe/queue交互调试时，可以2个进程模块之间单独调试，然后整体联调.
+		&emsp;&emsp;多个进程通过pipe/queue交互调试时，可以2个进程模块之间单独调试，然后整体联调.  
 		&emsp;&emsp;python的/usr/local/lib/python2.7/dist-packages/multiprocessing库中对queue的操作是加了信号量和锁，对pipe的封装；在具体操作时可以直接用multiprocessing库中的pipe来操作。
 		
 - [ ] 13.使用嵌入式数据库保存plugin进程的会话状态(占时直接将会话状态信息写入原始文本文件保存,可选方案：1.levelDB,2.SQLite 3.BerkeleyDB(BDB)，前两者使用方便，代码量少，而且so cute. 首选其中一个，因为是单机，不考虑并发读写的情况，单单只从使用场景考虑，一个是key/value,一个是关系数据库;倾向于levelDB，c++代码典范,网上各种介绍哈~)
