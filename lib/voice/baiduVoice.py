@@ -66,9 +66,11 @@ class BaiduVoice(AbstractVoiceEngine):
             with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as f:
                 f.write(result)
                 tmpfile = f.name
-        #使用临时文件创建，防止多个进程操作一个文件
-        self.play(tmpfile)
-        os.remove(tmpfile)
+                #使用临时文件创建，防止多个进程操作一个文件
+                self.play(tmpfile)
+                os.remove(tmpfile)
+        else:
+            self._logger.debug("TTS service response[ %s ] with '%s'", json.dumps(result), self.TAG)
 
     def transcribe(self,fp):
         fp.seek(0)

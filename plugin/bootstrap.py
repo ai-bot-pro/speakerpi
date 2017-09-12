@@ -28,21 +28,18 @@ class Bootstrap(object):
 
     @classmethod
     def create_plugin_process(cls,plugin,speaker,block=False): 
-        print(str(os.getpid()))
         out_fp, in_fp = Pipe(True)
         son_processor = Process(target=cls.son_process, args=(speaker,(out_fp, in_fp),plugin.son_process_handle,block))
         # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
         son_processor.start()
         out_fp.close()
 
-        print(son_processor.pid)
         #其实直接可以通过son_processor.pid来判断是否进程还在，写入文件主要是方便查看当前运行的插件进程
         pid_file = os.path.join(lib.appPath.DATA_PATH,plugin.__name__+".pid")
         with open(pid_file, 'w') as pid_fp:
             pid_fp.write(str(son_processor.pid))
             pid_fp.close()
 
-        print([son_processor,in_fp])
         return [son_processor,in_fp]
 
     @classmethod

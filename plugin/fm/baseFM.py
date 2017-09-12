@@ -61,7 +61,7 @@ class AbstractFM(AbstractClass):
                 f.close()
                 if pid: 
                     print("pgkill mplay pid: %d"%pid)
-                    os.killpg(pid,signal.SIGTERM)
+                    os.killpg(pid,signal.SIGKILL)
     
     @classmethod
     def suspend_mplay_process(cls):

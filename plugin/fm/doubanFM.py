@@ -126,13 +126,6 @@ class DoubanFM(AbstractFM):
     def set_speaker(self,speaker):
         self.speaker = speaker
 
-    '''
-    def __del__(self):
-        self._logger.debug("______ delete douban fm ______")
-        pid_file = os.path.join(lib.appPath.DATA_PATH, self.__name__+'.pid');
-        os.remove(pid_file)
-    '''
-
     def __init__(self, account_id, password, douban_id=None,
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
             cur_song_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cur_song.txt')):
