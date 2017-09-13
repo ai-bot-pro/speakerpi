@@ -57,4 +57,4 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 7. [BerkeleDB简介](https://www.ibm.com/developerworks/cn/linux/l-embdb/index.html)，[reference](http://docs.oracle.com/cd/E17076_02/html/programmer_reference/index.html)，[capi](http://docs.oracle.com/cd/E17076_02/html/api_reference/C/frame_main.html)
 
 ### License
-This project uses the [Apache License Version 2.0](LICENSE) software license.
+This project uses the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) software license.
