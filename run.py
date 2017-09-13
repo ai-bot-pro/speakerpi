@@ -19,6 +19,9 @@ from plugin.fm.doubanFM import DoubanFM
 import plugin.fm.doubanFM
 from lib.conversation import Conversation
 from plugin.bootstrap import Bootstrap
+from lib.gpio.servo import Servo
+from lib.gpio.led import Led
+from lib.gpio.manager import Manager as gpioManager
 
 import signal
 
@@ -150,6 +153,38 @@ def debugDoubanFm(logger=None,args=None):
 
     print "debug doubanFM son process with pipe is over"
 
+def debugLedServo(logger,args):
+    print("debugLedServo")
+    gpioManager.sharkshark_blingbling(process_callback=None,
+                        process_args=(logger,args),
+                        shark_num=1,bling_num=100)
+
+def debugServo(logger,args):
+    print("debugServo")
+    Servo.get_instance().rotate(2)
+
+def debugDaemon(logger,args):
+    '''
+    #daemon servo
+    servo_son_processor = Process(target=lib.util.create_daemon, args=(Servo.get_instance().rotate,(1,)))
+    servo_son_processor.start()
+    servo_son_processor.join()
+    #daemon led
+    led_son_processor = Process(target=lib.util.create_daemon, args=(Led.get_instance().bling,(100,)))
+    led_son_processor.start()
+    led_son_processor.join()
+    time.sleep(30)
+    '''
+    print("debug daemon servo ")
+    lib.util.create_daemon(daemon_callback=debugServo,args=(logger,args))
+    print("debug daemon over")
+
+def debugLed(logger,args):
+    print("debugLed")
+    print("-----led bling----")
+    Led.get_instance().bling(1000)
+    print("-----led breath----")
+    Led.get_instance().breath(1)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='doubanFM pi')
@@ -157,6 +192,14 @@ if __name__ == '__main__':
                         help='Show debug messages')
     parser.add_argument('--debugDoubanFmPlugin', action='store_true',
                         help='Show debug douban fm plugin messages')
+    parser.add_argument('--debugLed', action='store_true',
+                        help='Show debug gpio led messages')
+    parser.add_argument('--debugServo', action='store_true',
+                        help='Show debug gpio servo messages')
+    parser.add_argument('--debugLedServo', action='store_true',
+                        help='Show debug gpio servo messages')
+    parser.add_argument('--debugDaemon', action='store_true',
+                        help='Show debug create daemon porcessor messages')
     args = parser.parse_args()
     
     logging.basicConfig(stream=sys.stdout)
@@ -164,10 +207,26 @@ if __name__ == '__main__':
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
+    if args.debugDaemon:
+        debugDaemon(logger,args)
+        exit()
+
+    if args.debugLedServo:
+        debugLedServo(logger,args)
+        exit()
+
+    if args.debugServo:
+        debugServo(logger,args)
+        exit()
+
+    if args.debugLed:
+        debugLed(logger,args)
+        exit()
+
     if args.debugDoubanFmPlugin:
         debugDoubanFm(logger,args)
-    else:
-        run('weedge',logger,args)
+        exit()
 
+    run('weedge',logger,args)
 
 

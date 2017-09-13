@@ -9,7 +9,7 @@ import re
 from lib.voice.baseVoice import AbstractVoiceEngine
 import lib.appPath
 
-def create_daemon(daemon_callback,**args):
+def create_daemon(daemon_callback=None,args=()):
     '''
     创建守护进程，daemon_callback 为运行守护进程的函数, args为对应运行函数参数
     '''
@@ -48,7 +48,7 @@ def create_daemon(daemon_callback,**args):
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
     
-    daemon_callback(args)
+    daemon_callback(*args)
 
 
 def filt_punctuation(text):
@@ -61,7 +61,11 @@ def filt_punctuation(text):
     en_punc = punctuation
     punctuation = hanzi_punc + en_punc
 
-    res = re.sub(ur"[%s]+" %punctuation, "", text.decode("utf-8"))
+    try:
+        res = re.sub(ur"[%s]+" %punctuation, "", text.decode("utf-8"))
+    except UnicodeDecodeError:
+        return ''
+
     return res
 
 def init_logger(name=""):

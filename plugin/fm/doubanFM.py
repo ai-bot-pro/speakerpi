@@ -417,13 +417,21 @@ class DoubanFM(AbstractFM):
                 artist = song['artist'].encode('UTF-8')
                 region = song['singers'][0]['region'][0].encode('UTF-8')
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
-                self.speaker.say(singer_info)
 
                 if(self.robot_open_shark_bling=="yes"):
-                    #动起来
+                    #边说,边dong
+                    gpioManager.sharkshark(
+                                son_process_callback=self.speaker.say,
+                                process_args=(singer_info,),
+                                shark_num=1)
+                else:
+                    self.speaker.say(singer_info)
+
+                if(self.robot_open_shark_bling=="yes"):
+                    #边播，边bling
                     gpioManager.sharkshark_blingbling(process_callback=self.mplay,
                         process_args=(url,),
-                        shark_num=3,bling_num=10)
+                        shark_num=0,bling_num=1000)
                 else:
                     self.mplay(url)
             except IndexError:

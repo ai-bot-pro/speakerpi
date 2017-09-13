@@ -3,6 +3,7 @@ import os
 import re
 import pkgutil
 from multiprocessing import Process, Queue, Pipe
+from lib.gpio.manager import Manager as gpioManager
 
 import lib.appPath
 import lib.util
@@ -123,19 +124,27 @@ class Bootstrap(object):
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
                 text = lib.util.filt_punctuation(text)
 
-                servo_son_processor = led_son_processor = None
-
                 if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
                     begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
                     if re.search(begin_instrunction, text) and self.getPluginPid(plugin) is None:
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
 
-                        #启动插件的时候控制肢体sharkshark和头部灯光blingbling （再来句嘿嘿?）
-                        servo_son_processor = Process(target=Servo.get_instance().rotate, args=(2,))
-                        led_son_processor = Process(target=Led.get_instance().bling, args=(3,))
-                        servo_son_processor.start()
-                        led_son_processor.start()
+                        #启动插件的时候控制肢体sharkshark和头部灯光blingbling （再来句插件启动语,嘿嘿）
+                        if('robot_open_shark_bling' in self.config
+                                and self.config['robot_open_shark_bling']=="yes"):
+                            gpioManager.sharkshark(
+                                son_process_callback=self.speaker.say,
+                                process_args=(text,),
+                                shark_num=1)
+
+                            #木有IPC，后台单独运行一小会儿就结束了，直接创建daemon进程Servo和Led
+                            led_son_processor = Process(target=lib.util.create_daemon, args=(Led.get_instance().bling,(300,)))
+                            led_son_processor.start()
+                            led_son_processor.join()
+
+                        #启动plugin进程然后继续
+                        continue
 
                 if (plugin.isValid(text)
                         and plugin.TAG in self.in_fps
@@ -152,10 +161,6 @@ class Bootstrap(object):
                     else:
                         self._logger.debug("Send Pipe Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.__name__)
                     finally:
-                        if servo_son_processor is not None:
-                            servo_son_processor.join()
-                        if led_son_processor is not None:
-                            led_son_processor.join()
                         return
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
 

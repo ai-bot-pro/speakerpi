@@ -2,6 +2,7 @@
 import sys, os, time, random
 import lib.util
 from plugin.bootstrap import Bootstrap
+from lib.gpio.manager import Manager as gpioManager
 
 import signal
 
@@ -35,7 +36,18 @@ class Conversation(object):
 
     def handleForever(self,interrupt_check=interrupt_callback,queue=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
-        self.speaker.say("hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我")
+        init_talk_text = "hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我"
+
+        if('robot_open_shark_bling' in self.bootstrap_config
+                and self.bootstrap_config['robot_open_shark_bling']=="yes"):
+            #会话开始 shark shark
+            gpioManager.sharkshark(
+                son_process_callback=self.speaker.say,
+                process_args=(init_talk_text,),
+                shark_num=1)
+        else:
+            self.speaker.say()
+
         while True:
             if interrupt_check is not None:
                 if interrupt_check(): 

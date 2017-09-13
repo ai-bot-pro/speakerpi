@@ -35,45 +35,32 @@ class Led(AbstractClass):
         self._pwm.start(0)
 
     def bling(self,number=None):
-        try:
-            n = 1
-            while  True:
-                GPIO.output(self.green_bcm, GPIO.LOW) #低电平，另一端是3.3V高电平，所以点亮LED
-                time.sleep(0.5) 
-                GPIO.output(self.green_bcm, GPIO.HIGH) #两端都是高电平，二极管熄灭
-                time.sleep(0.5)
-                if(number is None):
-                    continue
-                if(number is not None and n<number):
-                    n = n+1
-                    continue
-                if(number is not None and n==number):
-                    break
-        except KeyboardInterrupt:
-            pass
+        n = 0
+        while  True:
+            if(number is not None and n<number):
+                n = n+1
+            if(number is not None and n==number):
+                break
+            GPIO.output(self.green_bcm, GPIO.LOW) #低电平，另一端是3.3V高电平，所以点亮LED
+            time.sleep(0.01) 
+            GPIO.output(self.green_bcm, GPIO.HIGH) #两端都是高电平，二极管熄灭
+            time.sleep(0.01)
 
         self.clear()
 
     def breath(self,number=None):
-        try:
-          while True:
-            for dc in range(0, 101, 2):
-              p.ChangeDutyCycle(dc)
-              time.sleep(0.1)
-            for dc in range(100, -1, 2):
-              p.ChangeDutyCycle(dc)
-              time.sleep(0.1)
-            if(number is None):
-              continue
+        n=0
+        while True:
             if(number is not None and n<number):
-              n = n+1
-              continue
+                n = n+1
             if(number is not None and n==number):
-              break
-        
-        except KeyboardInterrupt:
-          pass
-
+                break
+            for dc in range(0, 101, 1):
+                self._pwm.ChangeDutyCycle(dc)
+                time.sleep(0.03)
+            for dc in range(100, -1, 1):
+                self._pwm.ChangeDutyCycle(dc)
+                time.sleep(0.03)
         self.clear()
 
     def clear(self):
