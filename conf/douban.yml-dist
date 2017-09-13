@@ -2,3 +2,4 @@ fm:
     account_id: ""
     password: ""
     douban_id: ""#选填，后续可能会用
+    robot_open_shark_bling: "" #选填,需要GPIO支持,外设的支持,默认不开启为'no'; 开启择填'yes'

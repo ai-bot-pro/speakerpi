@@ -1,4 +1,5 @@
 # -*- coding: utf-8-*-
+# from jasper mic.py change sm
 import os
 import tempfile
 import logging

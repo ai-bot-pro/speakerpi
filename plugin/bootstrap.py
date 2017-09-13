@@ -6,6 +6,8 @@ from multiprocessing import Process, Queue, Pipe
 
 import lib.appPath
 import lib.util
+from lib.gpio.servo import Servo
+from lib.gpio.led import Led
 
 class Bootstrap(object):
 
@@ -117,8 +119,11 @@ class Bootstrap(object):
 
         for plugin in self.plugins:
             for text in texts:
+
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
                 text = lib.util.filt_punctuation(text)
+
+                servo_son_processor = led_son_processor = None
 
                 if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
                     begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
@@ -126,7 +131,12 @@ class Bootstrap(object):
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
 
-                            
+                        #启动插件的时候控制肢体sharkshark和头部灯光blingbling （再来句嘿嘿?）
+                        servo_son_processor = Process(target=Servo.get_instance().rotate, args=(2,))
+                        led_son_processor = Process(target=Led.get_instance().bling, args=(3,))
+                        servo_son_processor.start()
+                        led_son_processor.start()
+
                 if (plugin.isValid(text)
                         and plugin.TAG in self.in_fps
                         and plugin.TAG in self.son_processors
@@ -142,6 +152,10 @@ class Bootstrap(object):
                     else:
                         self._logger.debug("Send Pipe Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.__name__)
                     finally:
+                        if servo_son_processor is not None:
+                            servo_son_processor.join()
+                        if led_son_processor is not None:
+                            led_son_processor.join()
                         return
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
 

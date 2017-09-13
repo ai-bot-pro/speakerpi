@@ -17,6 +17,8 @@ import lib.appPath
 from baseFM import AbstractFM
 from lib.voice.baiduVoice import BaiduVoice
 
+from lib.gpio.manager import Manager as gpioManager
+
 import signal
 
 interrupted = False
@@ -126,10 +128,11 @@ class DoubanFM(AbstractFM):
     def set_speaker(self,speaker):
         self.speaker = speaker
 
-    def __init__(self, account_id, password, douban_id=None,
+    def __init__(self, account_id, password, douban_id=None, robot_open_shark_bling="no",
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
             cur_song_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cur_song.txt')):
         super(self.__class__, self).__init__()
+        self.robot_open_shark_bling = robot_open_shark_bling
         self.ck = None
         self._mplay_process = None
         self._song = {}
@@ -168,6 +171,8 @@ class DoubanFM(AbstractFM):
                         config['password'] = fm_config['password']
                     if 'douban_id' in fm_config:
                         config['douban_id'] = fm_config['douban_id']
+                    if 'robot_open_shark_bling' in fm_config:
+                        config['robot_open_shark_bling'] = fm_config['robot_open_shark_bling']
         return config
 
     def load_cookies(self):
@@ -413,7 +418,14 @@ class DoubanFM(AbstractFM):
                 region = song['singers'][0]['region'][0].encode('UTF-8')
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
                 self.speaker.say(singer_info)
-                self.mplay(url)
+
+                if(self.robot_open_shark_bling=="yes"):
+                    #动起来
+                    gpioManager.sharkshark_blingbling(process_callback=self.mplay,
+                        process_args=(url,),
+                        shark_num=3,bling_num=10)
+                else:
+                    self.mplay(url)
             except IndexError:
                 self._logger.error("播放%s 失败",url)
                 pass

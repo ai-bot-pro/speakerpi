@@ -5,6 +5,9 @@ active_stt_engine: "baidu-ai-voice"
 #语音合成: tag
 speak_engine: "baidu-ai-voice"
 
+#是否启用通过GPIO控制的外设,默认不开启为no;开启为yes
+robot_open_shark_bling: "no"
+
 #插件
 plugins:
     # 模块类型: 

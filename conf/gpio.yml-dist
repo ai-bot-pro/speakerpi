@@ -1,0 +1,10 @@
+#通过gpio readall 查看对应的pin和BCM 相关的pwm自行补脑
+led:
+    green_bcm: 18
+ledRGB:
+    red_bcm: 15
+    green_bcm: 18
+    blue_bcm: 14
+servo:
+    #todo: 如果机器人有四个servo或者多个，需要用left_arm,right_arm,...区分
+    bcm: 7
