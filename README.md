@@ -2,9 +2,11 @@
 for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> FmPi -> xiaoC -> Running xiaoC(+Lego Technic; like [this]( https://www.mi.com/toyblock/)))
 
 ### Introduce
-douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor),还有一个JTBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
+douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个JTBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
 
-<div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/doubanfmspeakerpi.jpeg?imageMogr2/auto-orient" width="100%" height="100%"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/Speakerpi-head.jpeg" width="100%" height="100%"></div>  
+
+<div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/Speakerpi-body.jpeg" width="100%" height="100%"></div>
 
 ### 硬件
 
