@@ -7,7 +7,7 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka6epgtcj20ku0fmjud.jpg" width="70%" height="70%"></div>
 
 ### Thinking (mind mapping)
-<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fly1fjknvgfq39j21e70ougqn.jpg" width="100%" height="100%"></div>
+<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>
 
 ### 硬件
 
