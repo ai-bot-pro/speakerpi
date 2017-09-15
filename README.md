@@ -6,7 +6,7 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 
 <div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/Speakerpi-head.jpeg" width="100%" height="100%"></div>  
 
-<div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/Speakerpi-body.jpeg" width="100%" height="100%"></div>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka0pfgbfj20ku0rs0xa.jpg" width="100%" height="100%"></div>
 
 ### 硬件
 
