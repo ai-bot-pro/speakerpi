@@ -2,7 +2,7 @@
 for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC -> Running xiaoC(+Lego Technic; like [this]( https://www.mi.com/toyblock/)))
 
 ### Introduce
-douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个JTBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
+douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个TJBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
  <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka0pfgbfj20ku0rs0xa.jpg" width="70%" height="70%"></div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka6epgtcj20ku0fmjud.jpg" width="70%" height="70%"></div>
 
@@ -57,7 +57,7 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 ***参考链接***
 1. [init系统介绍](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html)
 2. [snowboy](http://docs.kitt.ai/snowboy/)
-3. [jtbot](https://github.com/ibmtjbot/tjbot)
+3. [tjbot](https://github.com/ibmtjbot/tjbot)
 4. [jasper-client](http://jasperproject.github.io/documentation/)
 5. [pocketsphix](https://cmusphinx.github.io/wiki/tutorialpocketsphinx/)
 6. [rpc框架](https://www.zhihu.com/question/25536695)(回答中提到[责任链框架](https://docs.jboss.org/netty/3.2/api/org/jboss/netty/channel/ChannelPipeline.html)在实际的工作写业务代码框架也用到，有点类似[AOP](https://www.zhihu.com/question/24863332) addBefore,addAfter... [简单示例](https://github.com/weedge/myframe/blob/master/src/libs/AppController.php))
