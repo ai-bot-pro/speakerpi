@@ -80,13 +80,16 @@ def send_handle(text,in_fp,son_processor,speaker):
     #父进程调用系统发信号给子进程
     if re.search(u'下一首', text) or re.search(u'删除', text) or re.search(u'不再播放', text):
         DoubanFM.kill_mplay_procsss()
+        gpioManager.kill_procsss(TAG)
         time.sleep(3)
     if re.search(u'暂停', text):
         DoubanFM.suspend_mplay_process()
+        gpioManager.suspend_process(TAG)
         speaker.say(text)
         time.sleep(1)
     if re.search(u'继续播放', text):
         DoubanFM.resume_mplay_process()
+        gpioManager.resume_process(TAG)
         speaker.say(text)
         time.sleep(1)
     if re.search(u'结束豆瓣电台', text):
@@ -430,9 +433,9 @@ class DoubanFM(AbstractFM):
 
                 if(self.robot_open_shake_bling=="yes"):
                     #边播，边bling
-                    gpioManager.shakeshake_blingbling(process_callback=self.mplay,
-                        process_args=(url,),
-                        shake_num=0,bling_num=song_length)
+                    gpioManager.shakeshake_blingbling(TAG,process_callback=self.mplay,
+                                    process_args=(url,),
+                                    shake_num=0,bling_num=song_length)
                 else:
                     self.mplay(url)
             except IndexError:

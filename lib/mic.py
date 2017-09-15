@@ -245,7 +245,7 @@ class Mic:
         frames = []
         # increasing the range # results in longer pause after command
         # generation
-        lastN = [THRESHOLD * 1.2 for i in range(30)]
+        lastN = [THRESHOLD * 1.2 for i in range(40)]
 
         for i in range(0, RATE / CHUNK * LISTEN_TIME):
 
@@ -277,6 +277,7 @@ class Mic:
             wav_fp.writeframes(''.join(frames))
             wav_fp.close()
             f.seek(0)
+            frames = []
             # check if detected_word was said
             if transcribe_callback is not None:
                 transcribed = transcribe_callback(f)
