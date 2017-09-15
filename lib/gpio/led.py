@@ -30,9 +30,28 @@ class Led(AbstractClass):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(green_bcm, GPIO.OUT)
         self.green_bcm = green_bcm
-        self._pwm = GPIO.PWM(green_bcm, 70) 
-        #启动pwm
-        self._pwm.start(0)
+        self.on_state = GPIO.HIGH
+        self.off_state = not self.on_state
+
+    def set_on(self):
+        GPIO.output(self.green_bcm, self.on_state)
+    def set_off(self):
+        GPIO.output(self.green_bcm, self.off_state)
+    def is_on(self):
+        return GPIO.input(self.green_bcm) == self.on_state
+    def is_off(self):
+        return GPIO.input(self.green_bcm) == self.off_state
+    def toggle(self):
+        if self.is_on():
+            self.set_off()
+        else:
+            self.set_on()
+
+    def blink(self, t=0.3):
+        self.set_off()
+        self.set_on()
+        time.sleep(t)
+        self.set_off()
 
     def bling(self,number=None):
         n = 0
@@ -41,14 +60,14 @@ class Led(AbstractClass):
                 n = n+1
             if(number is not None and n==number):
                 break
-            GPIO.output(self.green_bcm, GPIO.LOW) #低电平，另一端是3.3V高电平，所以点亮LED
-            time.sleep(0.01) 
-            GPIO.output(self.green_bcm, GPIO.HIGH) #两端都是高电平，二极管熄灭
-            time.sleep(0.01)
+            self.blink()
+            time.sleep(0.7)
 
-        self.clear()
+        GPIO.cleanup()
 
     def breath(self,number=None):
+        pwm = GPIO.PWM(self.green_bcm, 70) 
+        pwm.start(0)
         n=0
         while True:
             if(number is not None and n<number):
@@ -56,15 +75,12 @@ class Led(AbstractClass):
             if(number is not None and n==number):
                 break
             for dc in range(0, 101, 1):
-                self._pwm.ChangeDutyCycle(dc)
+                pwm.ChangeDutyCycle(dc)
                 time.sleep(0.03)
             for dc in range(100, -1, 1):
-                self._pwm.ChangeDutyCycle(dc)
+                pwm.ChangeDutyCycle(dc)
                 time.sleep(0.03)
-        self.clear()
-
-    def clear(self):
-        self._pwm.stop()
+        pwm.stop()
         GPIO.cleanup()
 
 

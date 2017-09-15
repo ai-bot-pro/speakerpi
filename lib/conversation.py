@@ -38,13 +38,13 @@ class Conversation(object):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
         init_talk_text = "hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我"
 
-        if('robot_open_shark_bling' in self.bootstrap_config
-                and self.bootstrap_config['robot_open_shark_bling']=="yes"):
-            #会话开始 shark shark
-            gpioManager.sharkshark(
+        if('robot_open_shake_bling' in self.bootstrap_config
+                and self.bootstrap_config['robot_open_shake_bling']=="yes"):
+            #会话开始 shake shake
+            gpioManager.shakeshake(
                 son_process_callback=self.speaker.say,
                 process_args=(init_talk_text,),
-                shark_num=1)
+                shake_num=1)
         else:
             self.speaker.say()
 

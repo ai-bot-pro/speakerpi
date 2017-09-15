@@ -128,11 +128,11 @@ class DoubanFM(AbstractFM):
     def set_speaker(self,speaker):
         self.speaker = speaker
 
-    def __init__(self, account_id, password, douban_id=None, robot_open_shark_bling="no",
+    def __init__(self, account_id, password, douban_id=None, robot_open_shake_bling="no",
             cookie_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cookie.txt'),
             cur_song_file=os.path.join(lib.appPath.DATA_PATH, 'douban_cur_song.txt')):
         super(self.__class__, self).__init__()
-        self.robot_open_shark_bling = robot_open_shark_bling
+        self.robot_open_shake_bling = robot_open_shake_bling
         self.ck = None
         self._mplay_process = None
         self._song = {}
@@ -171,8 +171,8 @@ class DoubanFM(AbstractFM):
                         config['password'] = fm_config['password']
                     if 'douban_id' in fm_config:
                         config['douban_id'] = fm_config['douban_id']
-                    if 'robot_open_shark_bling' in fm_config:
-                        config['robot_open_shark_bling'] = fm_config['robot_open_shark_bling']
+                    if 'robot_open_shake_bling' in fm_config:
+                        config['robot_open_shake_bling'] = fm_config['robot_open_shake_bling']
         return config
 
     def load_cookies(self):
@@ -416,22 +416,23 @@ class DoubanFM(AbstractFM):
                 title = song['title'].encode('UTF-8')
                 artist = song['artist'].encode('UTF-8')
                 region = song['singers'][0]['region'][0].encode('UTF-8')
+                song_length = song['length']
                 singer_info = "歌曲" + title + "来自专辑" + albumtitle + "由" + region +"歌手" + artist + "演唱"
 
-                if(self.robot_open_shark_bling=="yes"):
+                if(self.robot_open_shake_bling=="yes"):
                     #边说,边dong
-                    gpioManager.sharkshark(
+                    gpioManager.shakeshake(
                                 son_process_callback=self.speaker.say,
                                 process_args=(singer_info,),
-                                shark_num=1)
+                                shake_num=1)
                 else:
                     self.speaker.say(singer_info)
 
-                if(self.robot_open_shark_bling=="yes"):
+                if(self.robot_open_shake_bling=="yes"):
                     #边播，边bling
-                    gpioManager.sharkshark_blingbling(process_callback=self.mplay,
+                    gpioManager.shakeshake_blingbling(process_callback=self.mplay,
                         process_args=(url,),
-                        shark_num=0,bling_num=1000)
+                        shake_num=0,bling_num=song_length)
                 else:
                     self.mplay(url)
             except IndexError:

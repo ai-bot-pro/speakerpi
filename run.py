@@ -104,6 +104,10 @@ def run(robot_name="ROBOT",logger=None,args=None):
     bootstrap_process.join()
     '''
 
+def debugMic(logger,args):
+    pass
+    
+
 def debugDoubanFm(logger=None,args=None):
     baidu_voice = BaiduVoice.get_instance()
 
@@ -155,9 +159,9 @@ def debugDoubanFm(logger=None,args=None):
 
 def debugLedServo(logger,args):
     print("debugLedServo")
-    gpioManager.sharkshark_blingbling(process_callback=None,
+    gpioManager.shakeshake_blingbling(process_callback=None,
                         process_args=(logger,args),
-                        shark_num=1,bling_num=100)
+                        shake_num=1,bling_num=100)
 
 def debugServo(logger,args):
     print("debugServo")
@@ -182,9 +186,9 @@ def debugDaemon(logger,args):
 def debugLed(logger,args):
     print("debugLed")
     print("-----led bling----")
-    Led.get_instance().bling(1000)
+    Led.get_instance().bling(10)
     print("-----led breath----")
-    Led.get_instance().breath(1)
+    Led.get_instance().breath(10)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='doubanFM pi')
@@ -200,12 +204,18 @@ if __name__ == '__main__':
                         help='Show debug gpio servo messages')
     parser.add_argument('--debugDaemon', action='store_true',
                         help='Show debug create daemon porcessor messages')
+    parser.add_argument('--debugMic', action='store_true',
+                        help='Show debug mic messages')
     args = parser.parse_args()
     
     logging.basicConfig(stream=sys.stdout)
     logger = logging.getLogger("")
     if args.debug:
         logger.setLevel(logging.DEBUG)
+
+    if args.debugMic:
+        debugMic(logger,args)
+        exit()
 
     if args.debugDaemon:
         debugDaemon(logger,args)
