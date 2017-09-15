@@ -2,7 +2,7 @@
 for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC -> Running xiaoC(+Lego Technic; like [this]( https://www.mi.com/toyblock/)))
 
 ### Introduce
-douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个TJBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
+&emsp;&emsp;douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个TJBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it  
  <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka0pfgbfj20ku0rs0xa.jpg" width="70%" height="70%"></div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka6epgtcj20ku0fmjud.jpg" width="70%" height="70%"></div>
 
@@ -54,7 +54,7 @@ douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电�
 3. 在播放音乐的时候，有时候会唤醒机器人，所以唤醒词尽量独特点，但是这个还是会有可能碰巧播放的音乐的某段音频和唤醒词，与训练好的唤唤醒词模型刚好匹配上。除非另想独特的办法规避(可以用图像识别的方式，用特定的唤醒图片，哈哈，貌似可行，适合盲人or哑人):smile:
 
 ***issues***  
-在开发中遇到的问题，现在都放在dayone里头了，后续整理放在issues里头，防止后续采坑哦，先写一个：
+&emsp;&emsp;在开发中遇到的问题，现在都放在dayone里头了，后续整理放在issues里头，防止后续采坑哦，先写一个：
 1. 通过GPIO控制servo的执行，必须是运行主进程来控制，所以想和servo搭配操作的逻辑由子进程来完成；以一个daemon进程处理也不行，除非以一个主程序产生的daemon进程处理。具体为啥这样子，应该和底层封装的_GPIO.arm-linux-gnueabihf.so文件有关。led的处理则可以在子进程中处理。
 
 
