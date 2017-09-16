@@ -94,6 +94,7 @@ def send_handle(text,in_fp,son_processor,speaker):
         time.sleep(1)
     if re.search(u'结束豆瓣电台', text):
         DoubanFM.kill_mplay_procsss()
+        gpioManager.kill_procsss(TAG)
         in_fp.close()
         #相当于执行os.waitpid(son_processor.pid)等待资源回收
         son_processor.join()

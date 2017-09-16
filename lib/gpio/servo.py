@@ -37,7 +37,7 @@ class Servo(AbstractClass):
         self._pwm = GPIO.PWM(bcm, 50) 
         self._pwm.start(7)
 
-    def get_bcm_port():
+    def get_bcm_port(self):
         return self.bcm
 
     def rotate(self,number=1):

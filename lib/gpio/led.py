@@ -33,8 +33,8 @@ class Led(AbstractClass):
         self.on_state = GPIO.HIGH
         self.off_state = not self.on_state
 
-    def get_bcm_port():
-        return self.gree_bcm
+    def get_bcm_port(self):
+        return self.green_bcm
     def set_on(self):
         GPIO.output(self.green_bcm, self.on_state)
     def set_off(self):

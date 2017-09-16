@@ -28,23 +28,23 @@ class Manager:
             print("shakeshake")
             servo = Servo.get_instance()
             servo_son_processor = Process(target=servo.rotate, args=(shake_num,))
-            servo_son_processor.start()
-            servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+servo.get_bcm_port()+"_servo.pid")
+            servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+str(servo.get_bcm_port())+"_servo.pid")
             with open(servo_pid_file, 'w') as pid_fp:
                 pid_fp.write(str(servo_son_processor.pid))
                 pid_fp.close()
+            servo_son_processor.start()
         if(bling_num>0):
             print("blingbling")
             led = Led.get_instance()
             led_son_processor = Process(target=led.bling, args=(bling_num,))
-            led_son_processor.start()
-            led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+led.get_bcm_port()+"_led.pid")
+            led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+str(led.get_bcm_port())+"_led.pid")
             with open(led_pid_file, 'w') as pid_fp:
                 pid_fp.write(str(led_son_processor.pid))
                 pid_fp.close()
+            led_son_processor.start()
 
         if process_callback is not None:
-             process_callback(*process_args)
+            process_callback(*process_args)
         
         if(shake_num>0):
             servo_son_processor.join()
