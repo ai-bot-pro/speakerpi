@@ -28,7 +28,7 @@ def son_process(x, pipe,block=False):
 
 if __name__ == '__main__':
     out_pipe, in_pipe = Pipe(True)
-    son_p = Process(target=son_process, args=(100, (out_pipe, in_pipe),False))
+    son_p = Process(target=son_process, args=(100, (out_pipe, in_pipe),True))
     son_p.start()
     # 等pipe被fork 后，关闭主进程的输出端
     # 这样，创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口

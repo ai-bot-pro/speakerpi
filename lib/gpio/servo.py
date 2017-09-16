@@ -38,7 +38,7 @@ class Servo(AbstractClass):
         self._pwm.start(7)
 
     def get_bcm_port(self):
-        return self.bcm
+        return str(self.bcm)
 
     def rotate(self,number=1):
         for n in range(0,number):

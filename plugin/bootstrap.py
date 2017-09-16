@@ -133,15 +133,16 @@ class Bootstrap(object):
                         #启动插件的时候控制肢体shakeshake和头部灯光blingbling （再来句插件启动语,嘿嘿）
                         if('robot_open_shake_bling' in self.config
                                 and self.config['robot_open_shake_bling']=="yes"):
-                            gpioManager.shakeshake(
-                                son_process_callback=self.speaker.say,
-                                process_args=(text,),
-                                shake_num=1)
-
-                            #木有IPC，后台单独运行一小会儿就结束了，直接创建daemon进程Servo和Led
-                            led_son_processor = Process(target=lib.util.create_daemon, args=(Led.get_instance().bling,(3,)))
+                            #木有IPC，后台单独运行一小会儿就结束了，直接创建daemon进程Led
+                            led_son_processor = Process(target=lib.util.create_daemon, 
+                                    args=(Led.get_instance().bling,(3,)))
                             led_son_processor.start()
                             led_son_processor.join()
+
+                            #主进程shake
+                            gpioManager.shakeshake( son_process_callback=self.speaker.say,
+                                process_args=(text,), shake_num=1)
+
 
                         #启动plugin进程然后继续
                         continue

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys,os,time
 from multiprocessing import Process, Queue, Pipe
+import psutil
+import signal
 
 import lib.appPath
 from lib.gpio.servo import Servo
@@ -28,20 +30,20 @@ class Manager:
             print("shakeshake")
             servo = Servo.get_instance()
             servo_son_processor = Process(target=servo.rotate, args=(shake_num,))
-            servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+str(servo.get_bcm_port())+"_servo.pid")
+            servo_son_processor.start()
+            servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+servo.get_bcm_port()+"_servo.pid")
             with open(servo_pid_file, 'w') as pid_fp:
                 pid_fp.write(str(servo_son_processor.pid))
                 pid_fp.close()
-            servo_son_processor.start()
         if(bling_num>0):
             print("blingbling")
             led = Led.get_instance()
             led_son_processor = Process(target=led.bling, args=(bling_num,))
-            led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+str(led.get_bcm_port())+"_led.pid")
+            led_son_processor.start()
+            led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+led.get_bcm_port()+"_led.pid")
             with open(led_pid_file, 'w') as pid_fp:
                 pid_fp.write(str(led_son_processor.pid))
                 pid_fp.close()
-            led_son_processor.start()
 
         if process_callback is not None:
             process_callback(*process_args)
@@ -69,16 +71,16 @@ class Manager:
         '''
         kill当前播放的进程 （进程id从文件中获取）
         '''
-        def kill_pid(pid_file,tag):
+        def kill_pid(pid_file):
             if os.path.exists(pid_file):
                 with open(pid_file, 'r') as f:
                     pid = int(f.read())
                     print("-----")
-                    print(pid_file,pid)
+                    print(pid_file)
                     print("-----")
                     f.close()
                     if pid: 
-                        print("kill "+tag+" pid: %d"%pid)
+                        print("kill pid: %d"%pid)
                         os.kill(pid,signal.SIGKILL)
         led = Led.get_instance()
         servo = Servo.get_instance()
@@ -98,7 +100,7 @@ class Manager:
                 with open(pid_file, 'r') as f:
                     pid = int(f.read())
                     print("---suspend--")
-                    print(pid_file,pid)
+                    print(pid_file)
                     print("-----")
                     f.close()
                     if pid: 
@@ -106,10 +108,12 @@ class Manager:
                         res = psutil.Process(pid).suspend()
             return res
 
-        pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"led_.pid")
-        res1 = suspend(pid_file)
-        pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"servo_.pid")
-        res2 = suspend(pid_file)
+        led = Led.get_instance()
+        servo = Servo.get_instance()
+        led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+led.get_bcm_port()+"_led.pid")
+        res1 = suspend(led_pid_file)
+        servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+servo.get_bcm_port()+"_servo.pid")
+        res2 = suspend(servo_pid_file)
         return res1 or res2
     
     @classmethod
@@ -123,16 +127,19 @@ class Manager:
                 with open(pid_file, 'r') as f:
                     pid = int(f.read())
                     print("---resume--")
-                    print(pid_file,pid)
+                    print(pid_file)
                     print("-----")
                     f.close()
                     if pid: 
                         print("resume  pid: %d"%pid)
                         res = psutil.Process(pid).resume()
             return res
-        pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"led_.pid")
-        res1 = resume(pid_file)
-        pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"led_.pid")
-        res2 = resume(pid_file)
+
+        led = Led.get_instance()
+        servo = Servo.get_instance()
+        led_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+led.get_bcm_port()+"_led.pid")
+        res1 = resume(led_pid_file)
+        servo_pid_file = os.path.join(lib.appPath.DATA_PATH,tag+"_"+servo.get_bcm_port()+"_servo.pid")
+        res2 = resume(servo_pid_file)
 
         return res1 or res2

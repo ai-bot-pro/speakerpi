@@ -56,7 +56,7 @@ class AbstractFM(AbstractClass):
             with open(pid_file, 'r') as f:
                 pid = int(f.read())
                 print("-----")
-                print(pid_file,pid)
+                print(pid_file)
                 print("-----")
                 f.close()
                 if pid: 
@@ -73,7 +73,7 @@ class AbstractFM(AbstractClass):
         with open(pid_file, 'r') as f:
             pid = int(f.read())
             print("---suspend--")
-            print(pid_file,pid)
+            print(pid_file)
             print("-----")
             f.close()
             if pid: 
@@ -90,7 +90,7 @@ class AbstractFM(AbstractClass):
         with open(pid_file, 'r') as f:
             pid = int(f.read())
             print("---resume--")
-            print(pid_file,pid)
+            print(pid_file)
             print("-----")
             f.close()
             if pid: 
