@@ -77,7 +77,10 @@ def send_handle(text,in_fp,son_processor,speaker):
         print("send valid word %s to pipe" % text)
         in_fp.send(text)
     #父进程调用系统发信号给子进程
-    if re.search(u'下一首', text) or re.search(u'删除', text) or re.search(u'不再播放', text):
+    if (re.search(u'下一首', text) 
+            or re.search(u'删除', text) 
+            or re.search(u'不在播放', text)
+            or re.search(u'不再播放', text)):
         DoubanFM.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
         time.sleep(3)
@@ -107,13 +110,14 @@ def isValid(text):
             u"播放豆瓣电台",
             u"下一首", 
             u"暂停",
-            u"播放",
+            u"继续播放",
             u"喜欢这首歌",
             u"不喜欢这首歌",
             u"删除这首歌",
             u"不再播放这首歌",
-            u"下载",
-            u"下载这首歌",
+            u"不在播放这首歌",
+            #u"下载",
+            #u"下载这首歌",
             u"结束豆瓣电台",
         ]
 
