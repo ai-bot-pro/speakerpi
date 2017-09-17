@@ -126,7 +126,9 @@ class Bootstrap(object):
 
                 if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
                     begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
-                    if re.search(begin_instrunction, text) and self.getPluginPid(plugin) is None:
+                    begin_instrunction = begin_instrunction.split(",")
+                    if (any(text in phrase for phrase in begin_instrunction)
+                            and self.getPluginPid(plugin) is None):
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
 
@@ -141,11 +143,7 @@ class Bootstrap(object):
 
                             #主进程shake
                             gpioManager.shakeshake( son_process_callback=self.speaker.say,
-                                process_args=(text,), shake_num=1)
-
-
-                        #启动plugin进程然后继续
-                        continue
+                                process_args=(text,), shake_num=0)
 
                 if (plugin.isValid(text)
                         and plugin.TAG in self.in_fps

@@ -18,4 +18,7 @@ plugins:
     fm: 
         douban:
             begin_instrunction: "播放豆瓣电台"
-            over_instruction: "关闭豆瓣电台"
+            #over_instruction: "关闭豆瓣电台"
+    volume: 
+        pulseAudio:
+            begin_instrunction: "声音大一点,声音小一点,静音,安静,打开声音"

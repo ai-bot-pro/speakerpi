@@ -15,7 +15,6 @@ import yaml
 
 import lib.appPath
 from baseFM import AbstractFM
-from lib.voice.baiduVoice import BaiduVoice
 
 from lib.gpio.manager import Manager as gpioManager
 
@@ -74,7 +73,7 @@ def send_handle(text,in_fp,son_processor,speaker):
     speaker: voice实例(tts)
     '''
     print("<<<<<<< begin douban fm send pipe handle >>>>>>>")
-    if all(word not in text for word in [u'暂停',u'继续播放']):
+    if all(word not in text for word in [u'暂停',u'继续播放',u'播放豆瓣电台']):
         print("send valid word %s to pipe" % text)
         in_fp.send(text)
     #父进程调用系统发信号给子进程
