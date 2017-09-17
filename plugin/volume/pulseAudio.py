@@ -28,7 +28,11 @@ def send_handle(text,in_fp,son_processor,speaker):
     res = False
     if re.search(u'声音大一点', text):
         res = PulseAudio.turnUp()
+    if re.search(u'声音再大一点', text):
+        res = PulseAudio.turnUp()
     if re.search(u'声音小一点', text):
+        res = PulseAudio.turnDown()
+    if re.search(u'声音再小一点', text):
         res = PulseAudio.turnDown()
     if re.search(u'静音', text):
         res = PulseAudio.off()
@@ -48,7 +52,9 @@ def send_handle(text,in_fp,son_processor,speaker):
 def isValid(text):
     valid_words = [
             u"声音大一点",
+            u"声音再大一点",
             u"声音小一点", 
+            u"声音再小一点",
             u"静音",
             u"安静",
             u"打开声音",
