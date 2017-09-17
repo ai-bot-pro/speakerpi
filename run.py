@@ -11,7 +11,7 @@ import psutil
 
 from lib.voice.baiduVoice import BaiduVoice
 from lib.voice.snowboyVoice import SnowboyVoice
-from lib.mic import Mic,RawTextMic
+from lib.mic import RawTextMic,ArecordMic,PyAudioMic
 import lib.appPath
 import lib.util
 
@@ -78,10 +78,11 @@ def run(robot_name="ROBOT",logger=None,args=None):
     speak_engine_class = lib.util.get_engine_by_tag(speak_engine_tag)
     
     #语音录入实例
-    mic = RawTextMic() if args.debug else Mic()
+    passive_mic = RawTextMic() if args.debug else ArecordMic()
+    active_mic = RawTextMic() if args.debug else PyAudioMic()
     
     #会话(指令)初始
-    conversation = Conversation(robot_name, mic, 
+    conversation = Conversation(robot_name, passive_mic, active_mic,
             speak_engine_class.get_instance(), 
             active_stt_engine_class.get_instance(),
             passive_stt_engine_class.get_instance(),
@@ -105,8 +106,28 @@ def run(robot_name="ROBOT",logger=None,args=None):
     '''
 
 def debugMic(logger,args):
-    pass
-    
+    mic = ArecordMic()
+    active_mic = PyAudioMic()
+    passive_stt = SnowboyVoice.get_instance()
+    active_stt = BaiduVoice.get_instance()
+    mic.init_recording()
+    while True:
+        if interrupt_callback():
+            logger.debug("debug mic break.")
+            break
+        threshold, transcribed = mic.passiveListen("weedge",
+                    transcribe_callback=passive_stt.transcribe)
+        if not transcribed or not threshold:
+            #logger.debug("Nothing has been said or transcribed.")
+            continue
+        #passive_stt.play(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
+        input = active_mic.activeListenToAllOptions(THRESHOLD=threshold,
+                speak_callback=active_stt.play,transcribe_callback=active_stt.transcribe)
+        logger.debug("input:%s",input)
+        if input:
+            active_stt.say(input)
+
+    mic.terminate()
 
 def debugDoubanFm(logger=None,args=None):
     baidu_voice = BaiduVoice.get_instance()

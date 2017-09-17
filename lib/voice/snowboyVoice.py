@@ -72,8 +72,11 @@ class SnowboyVoice(AbstractVoiceEngine):
         pass
 
     def transcribe(self,fp):
-        fp.seek(44)
-        data = fp.read()
+        if(type(fp) is str):
+            data = fp
+        else:
+            fp.seek(44)
+            data = fp.read()
         ans = self.detector.RunDetection(data)
         if ans == -1:
             self._logger.warning("Error initializing streams or reading audio data")

@@ -75,8 +75,11 @@ class BaiduVoice(AbstractVoiceEngine):
             os.remove(tmpfile)
 
     def transcribe(self,fp):
-        fp.seek(0)
-        records = fp.read()
+        if(type(fp) is str):
+            records = fp
+        else:
+            fp.seek(0)
+            records = fp.read()
         dict_data = self._aipSpeech.asr(records, 'wav', 16000, { 'lan': 'zh', })
         self._logger.debug('baidu stt response: %s',json.dumps(dict_data))
         transcribed = []

@@ -1,6 +1,6 @@
 # -*- coding: utf-8-*-
 # from jasper mic.py change sm
-import os
+import os,time
 import tempfile
 import logging
 import audioop
@@ -28,9 +28,41 @@ class RingBuffer(object):
         self._buf.clear()
         return tmp
 
+
+class MicWrapper:
+    '''
+    just a wrapper,just nothing todo
+    '''
+    def __init__(self):
+        pass
+
+    def passiveListen(self, detected_word, 
+            transcribe_callback=None,type="arecord"):
+        if(type=="pyaudio"):
+            mic = PyAudioMic()
+            return mic.passiveListen(detected_word, transcribe_callback)
+        if(type=="rawtext"):
+            mic = RawTextMic()
+            return mic.passiveListen(detected_word, transcribe_callback)
+
+        mic = ArecordMic()
+        return mic.passiveListen(detected_word, transcribe_callback)
+
+    def activeListenToAllOptions(self, THRESHOLD=None, speak_callback=None,
+            transcribe_callback=None, type="pyaudio"):
+        if(type=="pyaudio"):
+            mic = PyAudioMic()
+            return mic.activeListenToAllOptions(THRESHOLD,speak_callback)
+        if(type=="rawtext"):
+            mic = RawTextMic()
+            return mic.activeListenToAllOptions(THRESHOLD,speak_callback)
+        mic = ArecordMic()
+        return mic.activeListenToAllOptions(THRESHOLD,speak_callback)
+
 class RawTextMic:
     '''
-    命令行文字输入代替语音输入（测试调试使用,语音识别太费（¯﹃¯）口水)
+    命令行文字输入代替语音输入,just dummy
+    （测试调试使用,语音识别太费（¯﹃¯）口水)
     '''
     def __init__(self):
         pass
@@ -45,9 +77,81 @@ class RawTextMic:
         input = raw_input("YOU SAY: ")
         return input
 
-class Mic:
+class ArecordMic:
     '''
-    两种语音录入方式(命令arecord方式,暂时未开发; 利用pyaudio库,默认频率16000Hz)
+    通过arecord命令写入到buffer中，然后从buffer中获取音频数据给识别模块
+    '''
+    def __init__(self):
+        self._logger = lib.util.init_logger(__name__)
+        channel_num = 1
+        rate = 16000
+        self._ring_buffer = RingBuffer(channel_num*rate* 5)
+        self.recording = False
+
+    def terminate(self):
+        self.recording = False
+        self.record_thread.join()
+
+    def arecord_process(self):
+        CHUNK = 2048
+        RECORD_RATE = 16000
+        cmd = 'arecord -q -r %d -f S16_LE' % RECORD_RATE
+        self._logger.debug(cmd)
+        process = subprocess.Popen(cmd.split(' '),
+                                   stdout = subprocess.PIPE,
+                                   stderr = subprocess.PIPE)
+        wav = wave.open(process.stdout, 'rb')
+        while self.recording:
+            data = wav.readframes(CHUNK)
+            self._ring_buffer.extend(data)
+        process.terminate()
+
+    def init_recording(self):
+        """
+        开一个子线程用于将音频数据录入到共享的buffer里，然后主线程从buffer里头取出数据
+        """
+        self.recording = True
+        self.record_thread = threading.Thread(target = self.arecord_process)
+        self.record_thread.start()
+    
+    def passiveListen(self, detected_word, transcribe_callback=None):
+        if type(detected_word) is not list:
+            detected_word = [detected_word]
+            data = self._ring_buffer.get()
+            if len(data) == 0:
+                time.sleep(0.05)
+                return (None,None)
+            if transcribe_callback is not None:
+                transcribed = transcribe_callback(data)
+            else:
+                self._logger.error("passive listen no transcribe callback function")
+
+            words = [word for word in detected_word if word in transcribed]
+
+            if len(words)>0:
+                return (True, detected_word)
+        return (None, None)
+
+    def activeListenToAllOptions(self, THRESHOLD=None, speak_callback=None, transcribe_callback=None):
+
+        if speak_callback is not None:
+            speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/ding.wav"))
+
+        data = self._ring_buffer.get()
+        if len(data) == 0:
+            return None
+
+        if transcribe_callback is not None:
+            transcribed = transcribe_callback(data)
+
+        if speak_callback is not None:
+            speak_callback(os.path.join(lib.appPath.DATA_PATH,"snowboy/resources/dong.wav"))
+
+        return transcribed
+
+class PyAudioMic:
+    '''
+    通过pyaudio封装的lib库，对音频文件写入临时文件中，提供给识别模块读取
     '''
     def __init__(self):
         self._logger = lib.util.init_logger(__name__)
@@ -70,38 +174,24 @@ class Mic:
         THRESHOLD_MULTIPLIER = 1.8
         RATE = 16000
         CHUNK = 1024
-
-        # number of seconds to allow to establish threshold
         THRESHOLD_TIME = 1
 
-        # prepare recording stream
         stream = self._audio.open(format=pyaudio.paInt16,
                                   channels=1,
                                   rate=RATE,
                                   input=True,
                                   frames_per_buffer=CHUNK)
-
-        # stores the audio data
         frames = []
-
-        # stores the lastN score values
         lastN = [i for i in range(20)]
-
-        # calculate the long run average, and thereby the proper threshold
         for i in range(0, RATE / CHUNK * THRESHOLD_TIME):
-
             data = stream.read(CHUNK)
             frames.append(data)
-
-            # save this data point as a score
             lastN.pop(0)
             lastN.append(self.getScore(data))
             average = sum(lastN) / len(lastN)
 
         stream.stop_stream()
         stream.close()
-
-        # this will be the benchmark to cause a disturbance over!
         THRESHOLD = average * THRESHOLD_MULTIPLIER
 
         return THRESHOLD
@@ -115,71 +205,53 @@ class Mic:
         THRESHOLD_MULTIPLIER = 1.8
         RATE = 16000
         CHUNK = 1024
-
-        # number of seconds to allow to establish threshold
         THRESHOLD_TIME = 1
-
-        # number of seconds to listen before forcing restart
         LISTEN_TIME = 10
 
-        # prepare recording stream
         stream = self._audio.open(format=pyaudio.paInt16,
                                   channels=1,
                                   rate=RATE,
                                   input=True,
                                   frames_per_buffer=CHUNK)
 
-        # stores the audio data
+        #step 1. 在设定的阈值时间内,计算一个音频片段的rms(均方根--音频信号中的功率的度量)值的平均阈值(这里设置1秒的时间，hi一下)
         frames = []
-
-        # stores the lastN score values
-        lastN = [i for i in range(30)]
-
-        # calculate the long run average, and thereby the proper threshold
+        lastN = [i for i in range(20)]
         for i in range(0, RATE / CHUNK * THRESHOLD_TIME):
-
             data = stream.read(CHUNK)
             frames.append(data)
-
-            # save this data point as a score
             lastN.pop(0)
             lastN.append(self.getScore(data))
             average = sum(lastN) / len(lastN)
-
-        # this will be the benchmark to cause a disturbance over!
         THRESHOLD = average * THRESHOLD_MULTIPLIER
+        self._logger.debug("lastN:{%s},average:{%d},THRESHOLD:{%d}",lastN,average,THRESHOLD)
 
-        # save some memory for sound data
+        #step 2. 录取的音频片段的rms(均方根)值大于设定的阈值，则进行下步把这些录音片段用于语音识别；否则识别超时不成功
         frames = []
-
-        # flag raised when sound disturbance detected
+        rms = []
         didDetect = False
-
-        # start passively listening for disturbance above threshold
         for i in range(0, RATE / CHUNK * LISTEN_TIME):
-
             data = stream.read(CHUNK)
             frames.append(data)
             score = self.getScore(data)
-
+            rms.append(score)
             if score > THRESHOLD:
                 didDetect = True
                 break
-
-        # no use continuing if no flag raised
+        self._logger.debug("rms_values:{%s},last_score:{%d},THRESHOLD:{%d}",rms,score,THRESHOLD)
         if not didDetect:
             print "No disturbance detected"
             stream.stop_stream()
             stream.close()
             return (None, None)
 
+        #step 3. 开始识别
         # cutoff any recording before this disturbance was detected
         frames = frames[-20:]
 
         # otherwise, let's keep recording for few seconds and save the file
         DELAY_MULTIPLIER = 1
         for i in range(0, RATE / CHUNK * DELAY_MULTIPLIER):
-
             data = stream.read(CHUNK)
             frames.append(data)
 
@@ -229,7 +301,7 @@ class Mic:
         LISTEN_TIME = 12
 
         # check if no threshold provided
-        if THRESHOLD is None:
+        if THRESHOLD is None or int(THRESHOLD)<=1:
             THRESHOLD = self.fetchThreshold()
 
         if speak_callback is not None:
@@ -244,7 +316,6 @@ class Mic:
 
         frames = []
         # increasing the range # results in longer pause after command
-        # generation
         lastN = [THRESHOLD * 1.2 for i in range(40)]
 
         for i in range(0, RATE / CHUNK * LISTEN_TIME):
@@ -278,32 +349,9 @@ class Mic:
             wav_fp.close()
             f.seek(0)
             frames = []
-            # check if detected_word was said
             if transcribe_callback is not None:
                 transcribed = transcribe_callback(f)
             else:
                 self._logger.error("passive listen no transcribe callback function")
             return transcribed
-
-    def arecod_process(self):
-        CHUNK = 2048
-        RECORD_RATE = 16000
-        cmd = 'arecord -q -r %d -f S16_LE' % RECORD_RATE
-        process = subprocess.Popen(cmd.split(' '),
-                                   stdout = subprocess.PIPE,
-                                   stderr = subprocess.PIPE)
-        wav = wave.open(process.stdout, 'rb')
-        while self.recording:
-            data = wav.readframes(CHUNK)
-            self.ring_buffer.extend(data)
-        process.terminate()
-
-    def init_recording(self):
-        """
-        Start a thread for spawning arecord process and reading its stdout
-        """
-        self.recording = True
-        self.record_thread = threading.Thread(target = self.record_proc)
-        self.record_thread.start()
-
 
