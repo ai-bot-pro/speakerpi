@@ -68,6 +68,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 7. [BerkeleDB简介](https://www.ibm.com/developerworks/cn/linux/l-embdb/index.html)，[reference](http://docs.oracle.com/cd/E17076_02/html/programmer_reference/index.html)，[capi](http://docs.oracle.com/cd/E17076_02/html/api_reference/C/frame_main.html)
 8. [蓝牙编程](http://people.csail.mit.edu/albert/bluez-intro/c212.html)([PyBluez](https://github.com/karulis/pybluez))
 9. [语音识别的技术原理-知乎回答](https://www.zhihu.com/question/20398418)
-
+### 声明
+现定义为桌面级产品，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
 This project uses the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) software license.
