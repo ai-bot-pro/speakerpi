@@ -48,7 +48,7 @@ class Conversation(object):
                 process_args=(init_talk_text,),
                 shake_num=1)
         else:
-            self.speaker.say()
+            self.speaker.say(init_talk_text)
 
         '''
         两种语音录入方式(命令arecord方式; 利用pyaudio库。默认频率16000Hz)
