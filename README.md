@@ -51,7 +51,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 ***不足***
 1. 歌曲名称中如果有日文/韩文，语音识别率很低，几乎识别不了。(这个还和录音设备有关)，入口设置挺重要得，影响用户体验(每次都要近距离和robot说话,远距离的话依靠其他输入下发指令给robot,需要加一层接口层,适配不同的信号来源(语音，蓝牙，红外线？各种波)，当然这个是个桌面级的东东，就不要想多了)；尝试用pockectsphinx训练下，貌似语料字典不足啊，只能yy,或者找下支持日语/韩语的语音接口；找一找好的mini录音设备)
 2. 豆瓣的用户名和密码是放在本地配置中，容易泄露，可以想办法通过手机端蓝牙连接登陆（pi上的蓝牙不知道是否支持连接端和被连接端(因为用蓝牙speaker的话，以连接端接入，如果是通过手机接入，以被连接端接入),有点想小米的智能终端控制了哈,它是一站式的，因为这个调用多家服务，登陆体系多家哈，后续整个auth服务）
-3. 在播放音乐的时候，有时候会唤醒机器人，所以唤醒词尽量独特点，但是这个还是会有可能碰巧播放的音乐的某段音频和唤醒词，与训练好的唤唤醒词模型刚好匹配上。除非另想独特的办法规避(可以用图像识别的方式，用特定的唤醒图片，哈哈，貌似可行，适合盲人or哑人):smile:
+3. 在播放音乐的时候，有时候会唤醒机器人，所以唤醒词尽量独特点，但是这个还是会有可能(虽然几率很低)碰巧播放的音乐的某段音频和唤醒词，与训练好的唤唤醒词模型刚好匹配上(已优化了唤醒词录入的处理逻辑，可以较快速响应，减少不必要的录入)
 
 ***issues***  
 &emsp;&emsp;在开发中遇到的问题，现在都放在dayone里头了，后续整理放在issues里头，防止后续采坑哦，先写一个：
@@ -68,6 +68,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 7. [BerkeleDB简介](https://www.ibm.com/developerworks/cn/linux/l-embdb/index.html)，[reference](http://docs.oracle.com/cd/E17076_02/html/programmer_reference/index.html)，[capi](http://docs.oracle.com/cd/E17076_02/html/api_reference/C/frame_main.html)
 8. [蓝牙编程](http://people.csail.mit.edu/albert/bluez-intro/c212.html)([PyBluez](https://github.com/karulis/pybluez))
 9. [语音识别的技术原理-知乎回答](https://www.zhihu.com/question/20398418)
-
+### 声明
+现定义为桌面级产品，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
 This project uses the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) software license.
