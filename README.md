@@ -7,11 +7,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka6epgtcj20ku0fmjud.jpg" width="70%" height="70%"></div>
 
 ### Thinking (mind mapping)
-<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>
-### 演示
-<video width="480" height="320" controls>
-<source src="http://bsyqncdn.miaopai.com/stream/bjQPMPO~VI42-Lo7nSSDstO28WoR4qICt25F-g___16.mp4?ssig=5618695e5cd335210bd11ec30eac8134&time_stamp=1505659867127">
-</video>
+<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
+
 
 
 
@@ -22,6 +19,9 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 ### Install
 
 ### About
+
+
+***示例***
 
 **todo**
 - [x] 1.豆瓣电台播放下一首、喜欢、不喜欢、不再播放/删除等指令的实现,机制一样(暂时不实现调用写接口写入喜欢数据和播放数据，一般都做了特殊处理，需要权限验证，后续抓下包仔细研究下;分享)
