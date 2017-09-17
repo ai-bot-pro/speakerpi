@@ -8,6 +8,12 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 ### Thinking (mind mapping)
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>
+### 演示
+<video width="480" height="320" controls>
+<source src="http://bsyqncdn.miaopai.com/stream/bjQPMPO~VI42-Lo7nSSDstO28WoR4qICt25F-g___16.mp4?ssig=5618695e5cd335210bd11ec30eac8134&time_stamp=1505659867127">
+</video>
+
+
 
 ### 硬件
 
