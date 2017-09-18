@@ -61,7 +61,8 @@ class BaiduVoice(AbstractVoiceEngine):
         if not phrase: return False
         self._logger.debug("Saying '%s' with '%s'", phrase, self.TAG)
         result  = self._aipSpeech.synthesis(phrase, 'zh', 1, { 'per':self._per,'vol': 5, })
-        # 识别正确返回语音二进制 错误则返回dict 参照http://yuyin.baidu.com/docs/tts/196 错误码
+        tmpfile = None
+        # 识别正确返回语音二进制 错误则返回dict 参照 http://yuyin.baidu.com/docs/tts/196 错误码
         if not isinstance(result, dict):
             with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as f:
                 f.write(result)
@@ -69,7 +70,7 @@ class BaiduVoice(AbstractVoiceEngine):
         else:
             self._logger.debug("TTS service response[ %s ] with '%s'", json.dumps(result), self.TAG)
 
-        if os.path.exists(tmpfile):
+        if tmpfile is not None and os.path.exists(tmpfile):
             #写完了在播放，使用临时文件创建，防止多个进程操作一个文件
             self.play(tmpfile)
             os.remove(tmpfile)

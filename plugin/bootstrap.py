@@ -142,8 +142,7 @@ class Bootstrap(object):
                             led_son_processor.join()
 
                             #主进程shake
-                            gpioManager.shakeshake( son_process_callback=self.speaker.say,
-                                process_args=(text,), shake_num=0)
+                            #gpioManager.shakeshake( son_process_callback=self.speaker.say, process_args=(text,), shake_num=0)
 
                 if (plugin.isValid(text)
                         and plugin.TAG in self.in_fps
@@ -162,6 +161,7 @@ class Bootstrap(object):
                     finally:
                         return
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
+        self.speaker.say("您说的是"+text.encode('UTF-8')+"吗，我可能没有听清楚")
 
         
     @classmethod

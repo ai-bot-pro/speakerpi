@@ -24,7 +24,6 @@ def send_handle(text,in_fp,son_processor,speaker):
     speaker: voice实例(tts)
     '''
     print("<<<<<<< begin pulseAudio send pipe handle >>>>>>>")
-    #speaker.say(text)
     res = False
     if re.search(u'声音大一点', text):
         res = PulseAudio.turnUp()
@@ -35,13 +34,16 @@ def send_handle(text,in_fp,son_processor,speaker):
     if re.search(u'声音再小一点', text):
         res = PulseAudio.turnDown()
     if re.search(u'静音', text):
+        speaker.say(text.encode("UTF-8")+"操作后就不能听到我的声音了，请用打开声音指令")
         res = PulseAudio.off()
     if re.search(u'安静', text):
+        speaker.say(text.encode("UTF-8")+"操作后就不能听到我的声音了，请用打开声音指令")
         res = PulseAudio.off()
     if re.search(u'打开声音', text):
         res = PulseAudio.on()
     if res is not False:
         print("%s is ok"%text.encode("UTF-8"))
+        speaker.say(text.encode("UTF-8")+"操作好啦")
 
     in_fp.close()
     son_processor.join()
