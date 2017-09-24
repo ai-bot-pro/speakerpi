@@ -15,10 +15,15 @@ plugins:
     #       开始指令:
     #       结束指令:
     #   ...
-    fm: 
+    fm:
         douban:
-            begin_instrunction: "播放豆瓣电台"
-            #over_instruction: "关闭豆瓣电台"
+            #相当于长插件会话链接
+            begin_instruction: "播放豆瓣电台"
+            instruction: "下一首,暂停,继续播放, 喜欢这首歌, 不喜欢这首歌, 删除这首歌, 不再播放这首歌, 不在播放这首歌, 播放到我的私人频道,切换到我的私人频道, 我的私人频道, 私人频道, 播放红心歌单, 切换到红心电台, 切换到红心歌单, 红心歌单, 红心电台, 播放红星歌单, 切换到红星电台, 切换到红星歌单, 红星歌单, 红星电台,下载, 下载这首歌"
+            over_instruction: "关闭豆瓣电台,结束豆瓣电台"
     volume: 
         pulseAudio:
-            begin_instrunction: "声音大一点,声音小一点,静音,安静,打开声音"
+            #相当于短插件会话链接
+            begin_instruction: "声音大点,声音大一点,声音再大一点,声音在大一点,声音小点,声音小一点,声音再小一点,声音在小一点,静音,安静,打开声音"
+            instruction: ""
+            over_instruction: ""

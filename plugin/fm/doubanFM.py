@@ -5,6 +5,7 @@ import sys
 import json
 import re
 import time
+import random
 import pickle
 import urllib,urllib2
 import requests
@@ -36,20 +37,6 @@ signal.signal(signal.SIGINT, signal_handler)
 TAG = 'douban'
 CATE = 'fm'
 
-def dispatch_command_callback(text):
-    global interrupted
-    command = 'p'
-    if re.search(u'播放豆瓣电台', text): command = "p"
-    if re.search(u'下一首', text): command = "s"
-    if re.search(u'喜欢', text): command = "r"
-    if re.search(u'不喜欢', text): command = "u"
-    if re.search(u'删除', text): command = "b"
-    if re.search(u'不再播放', text): command = "b"
-    if re.search(u'暂停', text): command = "stop"
-    if re.search(u'继续播放', text): command = "continue"
-    if re.search(u'结束豆瓣电台', text): command = "exit"
-    return command
-
 def son_process_handle(speaker,get_text_callback):
     '''
     子进程处理逻辑
@@ -62,7 +49,7 @@ def son_process_handle(speaker,get_text_callback):
     douban_fm.set_speaker(speaker)
     douban_fm.start(get_text_callback=get_text_callback,
             interrupt_check=interrupt_callback,
-            play_command_callback=dispatch_command_callback,
+            play_command_callback=douban_fm.dispatch_command_callback,
             sleep_time=0.05)
 
 def send_handle(text,in_fp,son_processor,speaker):
@@ -75,7 +62,7 @@ def send_handle(text,in_fp,son_processor,speaker):
     '''
     print("<<<<<<< begin douban fm send pipe handle >>>>>>>")
 
-    if all(word not in text for word in [u'暂停',u'继续播放',u'播放豆瓣电台',u'结束豆瓣电台']):
+    if all(word not in text for word in [u'暂停',u'继续播放',u'播放豆瓣电台',]):
         print("send valid word %s to pipe" % text)
         in_fp.send(text)
 
@@ -86,6 +73,9 @@ def send_handle(text,in_fp,son_processor,speaker):
 
     #父进程调用系统发信号给子进程
     if (re.search(u'下一首', text) 
+            or re.search(u'红心', text) 
+            or re.search(u'红星', text) 
+            or re.search(u'私人', text) 
             or re.search(u'删除', text) 
             or re.search(u'不在播放', text)
             or re.search(u'不再播放', text)):
@@ -106,7 +96,7 @@ def send_handle(text,in_fp,son_processor,speaker):
         speaker.say(text.encode("UTF-8")+"已经处理")
         time.sleep(1)
 
-    if re.search(u'结束豆瓣电台', text):
+    if re.search(u'结束豆瓣电台', text) or re.search(u'关闭豆瓣电台', text):
         DoubanFM.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
         in_fp.close()
@@ -130,6 +120,13 @@ def isValid(text):
             u"删除这首歌",
             u"不再播放这首歌",
             u"不在播放这首歌",
+            u"切换到我的私人频道",
+            u"我的私人频道",
+            u"私人频道",
+            u"切换到红心电台",
+            u"切换到红心歌单",
+            u"红心歌单",
+            u"红心电台",
             #u"下载",
             #u"下载这首歌",
             u"结束豆瓣电台",
@@ -158,6 +155,7 @@ class DoubanFM(AbstractFM):
         self._mplay_process = None
         self._song = {}
         self._cur_song_file = cur_song_file
+        self.channel = None
         self.douban_id = douban_id
         self.cookie_file = cookie_file
         self.data = {
@@ -296,6 +294,59 @@ class DoubanFM(AbstractFM):
 
         return res
 
+    def getLikeRandomSong(self):
+        """
+        从红心歌曲中随机选一首
+        """
+        sids = self.getLikeSids()
+        sid = random.choice(sids)
+        songs = self.getLikeSongs([sid],1)
+        song = None
+        if songs is not None and len(songs)>0:
+            song = self._song = songs[0]
+            '''
+            with open(self._cur_song_file, 'w') as f:
+                pickle.dump(json.dumps(song), f)
+            '''
+
+        return song
+
+    def getLikeSongs(self,sids,num=None):
+        """
+        获取红心歌曲详细列表
+        """
+        if type(sids) is not list: return None
+
+        sids_str = "|".join(sids) if num is None or num<0 else "|".join(sids[0:num])
+        url = "https://douban.fm/j/v2/redheart/songs"
+        form_data = {
+                "sids":sids_str,
+                "kbps":128,
+                "ck":self.ck,
+                }
+        self._logger.debug("get song url: %s,params: %s",url,form_data)
+        res = self.session.post(url, data=form_data, cookies=self.session.cookies.get_dict())
+        songs = json.loads(res.text)
+        self._logger.debug("get songs: %s",songs)
+        
+        return songs 
+
+    def getLikeSids(self):
+        """
+        获取红心歌曲sid列表
+        """
+        url = "https://douban.fm/j/v2/redheart/basic"
+        payloads = { }
+        response = self.session.get(url, params=payloads, cookies=self.session.cookies.get_dict())
+        res = json.loads(response.text)
+
+        songs = res["songs"] if "songs" in res else []
+        sids = []
+        for song in songs:
+            sids.append(song['sid'])
+        return sids
+
+
 
     def getSong(self,type='p',sid=None,channel=0):
         """
@@ -352,8 +403,16 @@ class DoubanFM(AbstractFM):
 
         return sid
 
+    def playRandomLikeSong(self):
+        self._logger.debug("douban fm play random like song")
+        song = self.getLikeRandomSong()
+        self.playSong()
+
+
     def playNextLikeSong(self):
         self._logger.debug("douban fm play next like song")
+        if(self.channel=="redheart"):
+            return
         self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='r',sid=sid)
@@ -361,6 +420,8 @@ class DoubanFM(AbstractFM):
 
     def playNextUnLikeSong(self):
         self._logger.debug("douban fm play next unlike song")
+        if(self.channel=="redheart"):
+            return
         self._mplay_process.wait()
         sid = self._getSidFromLocal()
         self.getSong(type='u',sid=sid)
@@ -374,6 +435,9 @@ class DoubanFM(AbstractFM):
             pass
             self._mplay_process.kill()
         '''
+        if(self.channel=="redheart"):
+            self.playRandomLikeSong()
+            return
         sid = self._getSidFromLocal()
         self.getSong(type='b',sid=sid)
         self.playSong()
@@ -386,6 +450,9 @@ class DoubanFM(AbstractFM):
             pass
             self._mplay_process.kill()
         '''
+        if(self.channel=="redheart"):
+            self.playRandomLikeSong()
+            return
         sid = self._getSidFromLocal()
         self.getSong(type='s',sid=sid)
         self.playSong()
@@ -394,6 +461,9 @@ class DoubanFM(AbstractFM):
         '''
         自然播放到下首歌
         '''
+        if(self.channel=="redheart"):
+            self.playRandomLikeSong()
+            return
         sid = self._getSidFromLocal()
         type = 'p'
         if sid is None:#最开始,未有播放记录
@@ -498,4 +568,19 @@ class DoubanFM(AbstractFM):
 
         self._logger.debug("douban fm over")
 
+    def dispatch_command_callback(self,text):
+        command = 'p'
+        if re.search(u'播放豆瓣电台', text): command = "p"
+        if re.search(u'下一首', text): command = "s"
+        if re.search(u'喜欢', text): command = "r"
+        if re.search(u'不喜欢', text): command = "u"
+        if re.search(u'删除', text): command = "b"
+        if re.search(u'不再播放', text): command = "b"
+        if re.search(u'暂停', text): command = "stop"
+        if re.search(u'继续播放', text): command = "continue"
+        if re.search(u'结束豆瓣电台', text): command = "exit"
+        if re.search(u'红心', text): self.channel = "redheart"
+        if re.search(u'红星', text): self.channel = "redheart"
+        if re.search(u'私人', text): self.channel = "private"
+        return command
 

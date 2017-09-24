@@ -11,6 +11,15 @@ from plugin.bootstrap import Bootstrap
 import lib.appPath
 import lib.util
 import plugin.volume.pulseAudio 
+from plugin.fm.doubanFM import DoubanFM
+
+def doubanFM(logger,args):
+    speaker = BaiduVoice.get_instance()
+    douban_fm = DoubanFM.get_instance()
+    douban_fm.set_speaker(speaker)
+    for i in range(0,2):
+        song = douban_fm.playRandomLikeSong()
+    
 
 def pulseAudio(logger,args):
     baidu_voice = BaiduVoice.get_instance()
@@ -28,8 +37,9 @@ def pulseAudio(logger,args):
     words = [
             u"打开声音",
             u"声音小一点", 
+            u"声音小点", 
             u"声音再小一点", 
-            u"声音大一点",
+            u"声音大点",
             u"声音再大一点", 
             u"静音",
             u"打开声音",
@@ -57,6 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true',
                         help='Show debug messages')
     parser.add_argument('--pulseAudio', action='store_true',
+                        help='Show debug pulse audio plugin messages')
+    parser.add_argument('--doubanFM', action='store_true',
                         help='Show debug douban fm plugin messages')
 
     args = parser.parse_args()
@@ -66,4 +78,8 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
     if args.pulseAudio:
         pulseAudio(logger,args)
+        exit(0)
 
+    if args.doubanFM:
+        doubanFM(logger,args)
+        exit(0)

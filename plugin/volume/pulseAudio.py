@@ -25,13 +25,9 @@ def send_handle(text,in_fp,son_processor,speaker):
     '''
     print("<<<<<<< begin pulseAudio send pipe handle >>>>>>>")
     res = False
-    if re.search(u'声音大一点', text):
+    if re.search(u'大点', text) or re.search(u'大一点', text) or re.search(u'声音大', text):
         res = PulseAudio.turnUp()
-    if re.search(u'声音再大一点', text):
-        res = PulseAudio.turnUp()
-    if re.search(u'声音小一点', text):
-        res = PulseAudio.turnDown()
-    if re.search(u'声音再小一点', text):
+    if re.search(u'小点', text) or re.search(u'小一点', text) or re.search(u'声音小', text):
         res = PulseAudio.turnDown()
     if re.search(u'静音', text):
         speaker.say(text.encode("UTF-8")+"操作后就不能听到我的声音了，请用打开声音指令")
@@ -53,10 +49,14 @@ def send_handle(text,in_fp,son_processor,speaker):
 
 def isValid(text):
     valid_words = [
+            u"声音大点",
             u"声音大一点",
             u"声音再大一点",
+            u"声音在大一点",
+            u"声音小点", 
             u"声音小一点", 
             u"声音再小一点",
+            u"声音在小一点",
             u"静音",
             u"安静",
             u"打开声音",

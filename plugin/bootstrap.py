@@ -124,10 +124,10 @@ class Bootstrap(object):
                 self._logger.debug("Started to bootstrap asr word to plunin %s with input:%s", plugin, text)
                 text = lib.util.filt_punctuation(text)
 
-                if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']:
-                    begin_instrunction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instrunction']
-                    begin_instrunction = begin_instrunction.split(",")
-                    if (any(text in phrase for phrase in begin_instrunction)
+                if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instruction']:
+                    begin_instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instruction']
+                    begin_instruction = begin_instruction.split(",")
+                    if (any(text in phrase for phrase in begin_instruction)
                             and self.getPluginPid(plugin) is None):
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
@@ -144,7 +144,7 @@ class Bootstrap(object):
                             #主进程shake
                             #gpioManager.shakeshake( son_process_callback=self.speaker.say, process_args=(text,), shake_num=0)
 
-                if (plugin.isValid(text)
+                if ((plugin.isValid(text) or self.isValidPluginInstruction(plugin,text))
                         and plugin.TAG in self.in_fps
                         and plugin.TAG in self.son_processors
                         and self.getPluginPid(plugin) == self.son_processors[plugin.TAG].pid):
@@ -172,3 +172,19 @@ class Bootstrap(object):
             with open(pid_path,"r") as f:
                 pid = int(f.read())
         return pid 
+
+    def isValidPluginInstruction(self,plugin,text):
+        '''
+        验证text是否是插件引导词有效
+        '''
+        begin_instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instruction']
+        instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['instruction']
+        over_instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['over_instruction']
+        instructions = ",".join([begin_instruction,instruction,over_instruction])
+        instructions = [word.replace(' ','') for word in instructions.split(',')]
+        instructions = list(set(instructions))
+        self._logger.debug("instructions in %s %s: %s",plugin.CATE,plugin.TAG,','.join(instructions).encode("UTF-8"))
+        
+        res = any(word in text for word in instructions)
+        
+        return res
