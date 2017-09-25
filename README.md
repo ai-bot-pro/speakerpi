@@ -90,6 +90,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 8. [蓝牙编程](http://people.csail.mit.edu/albert/bluez-intro/c212.html)([PyBluez](https://github.com/karulis/pybluez))
 9. [语音识别的技术原理-知乎回答](https://www.zhihu.com/question/20398418)
 10. [在pi上运行TensorFlow](https://github.com/samjabrahams/tensorflow-on-raspberry-pi)
+11. [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural Networks](http://allenai.org/plato/xnornet/)
 ### 声明
 现定义为桌面级产品，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
