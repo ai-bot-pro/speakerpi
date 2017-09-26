@@ -32,7 +32,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 - [ ] 新闻播报
 - [ ] 天气播报
 - [ ] 生日祝福
-- [ ] 声控拍照/视频
+- [ ] 声控拍照/视频(物体识别，场景适合幼儿园的小朋友)
 - [ ] todolist
 - [ ] 笑话段子
 - [ ] 订餐/订票
@@ -67,7 +67,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 - [ ] 16.启动机器人进程的时候，可以模仿nginx那样的启动/平滑重启方式，通过daemon进程，加载对应配置，来管理worker进程,重启机器人服务进程的时候，可以不中断老的worker进程，等老的worker进程处理完逻辑(当然也需要发出一个信号告诉老的worker进程您可以结束了，有些worker进程可能一直在轮训，就比如播放音乐，没有接受到结束信号，就是一个死循环poll)，后续的daemon进程发来的指令由新的worker进程处理(这个暂时是个想法，具体细节需要了解下nginx server的处理细节)
 - [ ] 17.调用除百度外的语言识别服务，比如阿里的可以用嵌入式c++的sdk，通过websocket协议来连接语音服务，减少了连接次数，应该适应实效性的场景(比如演讲实时识别)，但是还没有具体试用。这条属于上面7中所述事情，细分下。
 - [ ] 18.调用snowboy的训练hotword(唤醒词)接口，来实现机器人初次使用的时候，引导用户录入自己定义的机器人名字唤醒词(或者调用本地的pocketshpinx的接口?)
-- [ ] 19.*****使用yield(generator)来实现多进程+协成的操作，充分利用pi的ARM 4核cpu*****
+- [ ] 19.使用yield(generator)来实现多进程+协成的操作，充分利用pi的ARM 4核cpu
+- [ ] 20.图像识别的算法尝试着利用pi3的cpu/gpu，在torch框架上跑一个小的数据量集的分类模型，参考xnornet 
 
 ***不足***
 1. 歌曲名称中如果有日文/韩文，语音识别率很低，几乎识别不了。(这个还和录音设备有关)，入口设置挺重要得，影响用户体验(每次都要近距离和robot说话,远距离的话依靠其他输入下发指令给robot,需要加一层接口层,适配不同的信号来源(语音，蓝牙，红外线？各种波)，当然这个是个桌面级的东东，就不要想多了)；尝试用pockectsphinx训练下，貌似语料字典不足啊，只能yy,或者找下支持日语/韩语的语音接口；找一找好的mini录音设备)
@@ -89,6 +90,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 7. [BerkeleDB简介](https://www.ibm.com/developerworks/cn/linux/l-embdb/index.html)，[reference](http://docs.oracle.com/cd/E17076_02/html/programmer_reference/index.html)，[capi](http://docs.oracle.com/cd/E17076_02/html/api_reference/C/frame_main.html)
 8. [蓝牙编程](http://people.csail.mit.edu/albert/bluez-intro/c212.html)([PyBluez](https://github.com/karulis/pybluez))
 9. [语音识别的技术原理-知乎回答](https://www.zhihu.com/question/20398418)
+10. [在pi上运行TensorFlow](https://github.com/samjabrahams/tensorflow-on-raspberry-pi)
+11. [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural Networks](http://allenai.org/plato/xnornet/)(采用torch框架)
 ### 声明
 现定义为桌面级产品，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
