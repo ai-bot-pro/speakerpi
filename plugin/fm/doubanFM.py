@@ -63,7 +63,7 @@ def send_handle(text,in_fp,son_processor,speaker):
     print("<<<<<<< begin douban fm send pipe handle >>>>>>>")
 
     if all(word not in text for word in [u'暂停',u'继续播放',u'播放豆瓣电台',]):
-        print("send valid word %s to pipe" % text)
+        print("send valid word %s to pipe" % text.encode("UTF-8"))
         in_fp.send(text)
 
     if (re.search(u'喜欢', text)):
