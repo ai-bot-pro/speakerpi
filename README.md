@@ -95,6 +95,6 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 12. [pi+Python + OpenCV监控](https://www.pyimagesearch.com/2015/05/25/basic-motion-detection-and-tracking-with-python-and-opencv/)、 [Smart Security Camera](https://www.hackster.io/hackerhouse/smart-security-camera-90d7bd)
 13. [opencv3.3.0开发文档](http://docs.opencv.org/3.3.0/)
 ### 声明
-现定义为桌面级产品，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
+现定义为桌面级产品(对于机器学习中的算法模型，可以作为验证已训练好模型的client工具环境)，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
 This project uses the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) software license.
