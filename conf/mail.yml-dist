@@ -1,0 +1,11 @@
+SMTP:
+	#发件人邮箱地址
+	fromEmail: ''
+	#发件人邮箱密码
+	fromEmailPassword: ''
+	#收件人邮箱
+	toEmail: ''
+	#发件人的SMTP协议服务地址
+	smtpServer: ''
+	#SMTP服务端口 默认25 未加密
+	smtpPort: 25

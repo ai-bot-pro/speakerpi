@@ -44,7 +44,8 @@ class AbstractVoiceEngine(object):
                     self._logger.setLevel(eval("logging."+profile['level']))
 
     @abstractmethod
-    def say(self, phrase, *args):
+    def say(self, phrase):
+        self._logger.info("Saying '%s' with dummy speaker", phrase)
         pass
 
     @abstractmethod

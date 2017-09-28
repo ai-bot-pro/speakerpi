@@ -1,0 +1,11 @@
+#y识别人的分类器模型
+people:
+    #识别部位(现提供三种: face, upperbody, fullbody;默认face)
+    body_part: "face"
+    #从上次监控到部位发送邮件的间隔时间(单位:s)
+    email_update_interval: 300 
+    #采用opencv提供的级联分类器
+    opencv_cascade_classifier:
+        face: "data/opencv/models/facial_recognition_model.xml"
+        upperbody: "data/opencv/models/upperbody_recognition_model.xml"
+        fullbody: "data/opencv/models/fullbody_recognition_model.xml"

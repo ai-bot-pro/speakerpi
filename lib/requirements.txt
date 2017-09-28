@@ -6,6 +6,14 @@ pytz==2014.10
 PyYAML==3.11
 requests==2.5.0
 
+# webserver
+flask
+
+# camera
+imutils
+numpy
+picamera[array]
+
 # baidu AI
 baidu-aip==1.6.4.0
 
