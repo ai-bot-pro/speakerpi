@@ -35,7 +35,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 5. opencv （图像视频处理使用的库，提供训练级联分类器）
 6. baidu-ai (调用ai提供的服务)
 7. snow-boy (在线训练语音唤醒词，或者调用接口初始化训练)
-9. pocketsphix （开源语音识别软件，主要用于学习语音识别技术原理)
+9. pocketsphix （开源语音识别工具，主要用于学习语音识别技术原理)
 
 ### Install
 1. 安装代码
