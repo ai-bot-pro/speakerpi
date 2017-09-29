@@ -181,7 +181,7 @@ class Bootstrap(object):
         instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['instruction']
         over_instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['over_instruction']
         instructions = ",".join([begin_instruction,instruction,over_instruction])
-        instructions = [word.replace(' ','') for word in instructions.split(',')]
+        instructions = [word.replace(' ','') for word in instructions.split(',') if word.replace(' ','') != ""]
         instructions = list(set(instructions))
         self._logger.debug("instructions in %s %s: %s",plugin.CATE,plugin.TAG,','.join(instructions).encode("UTF-8"))
         
