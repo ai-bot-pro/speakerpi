@@ -15,7 +15,8 @@ numpy
 picamera[array]
 
 # baidu AI
-baidu-aip==1.6.4.0
+# pip install git+https://github.com/Baidu-AIP/python-sdk.git@master 更新
+baidu-aip
 
 # NLP
 zhon==1.1.5

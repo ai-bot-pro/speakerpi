@@ -83,8 +83,6 @@ class PeopleMonitor(AbstractClass):
             self.object_classifier = cv2.CascadeClassifier(model_file)
         self.speaker = None
 
-        print(opencv_cascade_classifier,body_part,opencv_cascade_classifier[body_part],model_file)
-
     @classmethod
     def get_config(cls):
         config = {}

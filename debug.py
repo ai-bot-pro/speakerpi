@@ -1,11 +1,13 @@
 # -*- coding: utf-8-*-
 import sys, os, time, random
 import re
+import json
 import argparse
 import logging
 import psutil
 from multiprocessing import Process, Queue, Pipe
 
+from lib.graphic.baiduGraphic import BaiduGraphic
 from lib.voice.baiduVoice import BaiduVoice
 from lib.voice.baseVoice import AbstractVoiceEngine
 from plugin.bootstrap import Bootstrap
@@ -90,6 +92,20 @@ def peopleMonitor(logger,args):
 
     logger.debug("debug peopleMonitor is over")
 
+def baiduGraphic(logger,args):
+    def get_file_content(filePath):
+        with open(filePath, 'rb') as fp:
+            return fp.read()
+    baidu_graphic = BaiduGraphic.get_instance()
+
+    for detect_type in ["plant","dish","car","logo","animal","object","face"]:
+        file = os.path.join(lib.appPath.APP_PATH, '.'.join([detect_type,'jpg']))
+        img = get_file_content(file)
+        res = baidu_graphic.detectImage(img,detect_type)
+        logger.debug("%s: %s",detect_type,json.dumps(res,encoding="UTF-8",ensure_ascii=False))
+
+    logger.debug("debug baiduGraphic is over")
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='debug')
     parser.add_argument('--debug', action='store_true',
@@ -102,6 +118,8 @@ if __name__ == '__main__':
                         help='Show debug mail lib messages')
     parser.add_argument('--peopleMonitor', action='store_true',
                         help='Show debug people monitor plugin messages')
+    parser.add_argument('--baiduGraphic', action='store_true',
+                        help='Show debug baidu graphic lib messages')
 
     args = parser.parse_args()
     logging.basicConfig(stream=sys.stdout)
@@ -122,4 +140,8 @@ if __name__ == '__main__':
 
     if args.peopleMonitor:
         peopleMonitor(logger,args)
+        exit(0)
+
+    if args.baiduGraphic:
+        baiduGraphic(logger,args)
         exit(0)
