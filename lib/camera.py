@@ -10,7 +10,8 @@ class VideoCamera(object):
         self.vs = PiVideoStream().start()
         self.stop_status = False
         self.flip = flip
-        #time.sleep(2.0)
+        #启动视频调制正常显示状态需要一些时间
+        time.sleep(2.0)
 
     def __del__(self):
         if self.stop_status is False:
