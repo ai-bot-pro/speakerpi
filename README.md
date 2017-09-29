@@ -15,8 +15,27 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
 
 ### 硬件
+1. usb mini话筒 * 1
+2. 蓝牙speaker * 1
+3. hmdi转接线 * 1（这个看自己情况而定，主要是想后期使用显示器做一面魔镜）
+4. TJbot 3D模型 * 1 (这个模型是采用TJbot已经设计好的3D模型，然后通过3D打印机打印出来，这里头可选材料很多，各种材料价格不一，选用普通的PLA材料打印也花了300+大洋；有纸质的平面设计，但是找不到打印的地方。以后可以在这个模型的基础上进行改进,DIY。也许AR技术发展起来了，但愿3D打印的成本会降低点吧)
+5. LED * 3x2 (分别是没电阻的和有电阻的三原色RGB控制，多买了是为了防备使用中led灯调试坏了的情况发生)
+6. 摄像头 * 1
+7. Servo Motor * 5 (暂用一个，考虑四肢的情况)
+8. 母对公，母对母，公对公彩排线10 * 2x3 （暂时只用前两者）
+9. 树莓pi * 1 (包括散热片，保护壳)
+10. 16G microSD卡(读卡器) * 1 (16G已经足够了，当然土豪们可以追求更大空间)
+整体费用大概在1000+左右~ 发烧了。
 
 ### 软件
+1. jasper-client （用python写的语音交互(client)系统，采用单进程的方式管理插件，不能满足多指令同时交互)
+2. jtbot （用node.js写的语音交互client系统，从外观设计到调用的语音服务api，整套服务都有)
+3. pi的操作系统NOOBS
+4. xiaoc（client) (用Python写的client交互系统，采用引导进程来管理多个插件子进程，通过管道通信)
+5. opencv （图像视频处理使用的库，提供训练级联分类器）
+6. baidu-ai (调用ai提供的服务)
+7. snow-boy (在线训练语音唤醒词，或者调用接口初始化训练)
+9. pocketsphix （开源语音识别软件，主要用于学习语音识别技术原理)
 
 ### Install
 1. 安装代码
@@ -94,7 +113,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 1. [init系统介绍](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html)
 2. [snowboy](http://docs.kitt.ai/snowboy/)
 3. [tjbot](https://github.com/ibmtjbot/tjbot)
-4. [jasper-client](http://jasperproject.github.io/documentation/)
+4. [jasper-client](https://jasperproject.github.io/documentation/)
 5. [pocketsphix](https://cmusphinx.github.io/wiki/tutorialpocketsphinx/)
 6. [rpc框架](https://www.zhihu.com/question/25536695)(回答中提到[责任链框架](https://docs.jboss.org/netty/3.2/api/org/jboss/netty/channel/ChannelPipeline.html)在实际的工作写业务代码框架也用到，有点类似[AOP](https://www.zhihu.com/question/24863332) addBefore,addAfter... [简单示例](https://github.com/weedge/myframe/blob/master/src/libs/AppController.php))
 7. [BerkeleDB简介](https://www.ibm.com/developerworks/cn/linux/l-embdb/index.html)，[reference](http://docs.oracle.com/cd/E17076_02/html/programmer_reference/index.html)，[capi](http://docs.oracle.com/cd/E17076_02/html/api_reference/C/frame_main.html)
