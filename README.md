@@ -38,7 +38,9 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 - [ ] 订餐/订票
 - [x] 人体监控：开始人体监控，打开人体监控，结束人体监控，关闭人体监控
 - [ ] 声控拍照/视频(物体识别，场景适合幼儿园的小朋友；视频的话可以做一个监控，通过实时监控的视频数据包(packet),或者是每一帧的图片数据(frame)，通过管道的形式发到莫个服务端口，这个端口可以是本地监听的端口，比如用http协议访问这个端口就可以了(用VLC/mjpg-streamer软件可以实现视频数据包的形式，也可以用opencv直接获取每一帧的图片数据)，虽然是实时的，但是对于pi来说这种比较耗资源；还有种是方式是将视频数据包发送到中转服务端口上，然后通过中转服务将视频报转发给视频直播的云服务接口，中转服务可以做一层过滤发现，简单的处理方式是通过netcat(nc)将数据包转发到中转服务端口上，通过中转服务做进一步处理(放入buffer里头，定点上传等)，中转服务访问量不大的情况下，可以直接用nc来取数据，不需要考虑事件机制(如果需要的话可以用c++来实现一个简单的接受视频数据包服务，利用epoll注册监听/接受/读/写事件))。  
-简单实现：Client in PI [photographToClientSocket.py](https://gist.github.com/weedge/199010c48201ea9efe5c0e350ef5d02d),[videoToClientSocket.py](https://gist.github.com/weedge/86c356f1000fa03cc69edb905bd51dcb); Server in my Mac [photographTOServerSocket.py](https://gist.github.com/weedge/f87e84805b1e646514e17c2a6b1c8978), [videoToPlayerFromServerSocket.py](https://gist.github.com/weedge/ee9c99baffac998123cb27ea083dec0c).
+简单实现：  
+&emsp;&emsp;Client in PI [photographToClientSocket.py](https://gist.github.com/weedge/199010c48201ea9efe5c0e350ef5d02d),[videoToClientSocket.py](https://gist.github.com/weedge/86c356f1000fa03cc69edb905bd51dcb);  
+&emsp;&emsp;Server in my Mac [photographTOServerSocket.py](https://gist.github.com/weedge/f87e84805b1e646514e17c2a6b1c8978), [videoToPlayerFromServerSocket.py](https://gist.github.com/weedge/ee9c99baffac998123cb27ea083dec0c).
 
 
 **todo**
