@@ -25,7 +25,7 @@ def son_process_handle(speaker,get_text_callback):
     get_text_callback: 获取文本指令回调函数
     '''
     print("<<<<<<< begin monitor people son process handle >>>>>>>")
-    speaker.say('开始播放豆瓣电台')
+    speaker.say('开始人体监控')
     people_monitor = PeopleMonitor.get_instance()
     people_monitor.set_speaker(speaker)
     people_monitor.start(get_text_callback=get_text_callback)
@@ -40,7 +40,7 @@ def send_handle(text,in_fp,son_processor,speaker):
     '''
     print("<<<<<<< begin monitor people send pipe handle >>>>>>>")
 
-    if all(word not in text for word in [u'打开人体监控',]):
+    if all(word not in text for word in [u'打开人体监控',u'开始人体监控']):
         print("send valid word %s to pipe" % text.encode("UTF-8"))
         in_fp.send(text)
 
