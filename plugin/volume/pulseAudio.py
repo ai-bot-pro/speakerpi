@@ -43,7 +43,7 @@ def send_handle(text,in_fp,son_processor,speaker):
 
     in_fp.close()
     son_processor.join()
-    pid_file = os.path.join(lib.appPath.DATA_PATH, __name__+'.pid');
+    pid_file = os.path.join(lib.appPath.DATA_PATH, CATE+"_"+__name__+'.pid');
     if os.path.exists(pid_file):
         os.remove(pid_file)
 

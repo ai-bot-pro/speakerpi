@@ -24,7 +24,7 @@ class Bootstrap(object):
         self.son_processors = {}
         self.in_fps = {}
         for plugin in self.plugins:
-            pid_file = os.path.join(lib.appPath.DATA_PATH, plugin.__name__+'.pid');
+            pid_file = os.path.join(lib.appPath.DATA_PATH, plugin.CATE+"_"+plugin.__name__+'.pid');
             if os.path.exists(pid_file):
                 os.remove(pid_file)
             #self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,speaker)
@@ -38,7 +38,7 @@ class Bootstrap(object):
         out_fp.close()
 
         #其实直接可以通过son_processor.pid来判断是否进程还在，写入文件主要是方便查看当前运行的插件进程
-        pid_file = os.path.join(lib.appPath.DATA_PATH,plugin.__name__+".pid")
+        pid_file = os.path.join(lib.appPath.DATA_PATH,plugin.CATE+"_"+plugin.__name__+".pid")
         with open(pid_file, 'w') as pid_fp:
             pid_fp.write(str(son_processor.pid))
             pid_fp.close()
@@ -148,16 +148,16 @@ class Bootstrap(object):
                         and plugin.TAG in self.in_fps
                         and plugin.TAG in self.son_processors
                         and self.getPluginPid(plugin) == self.son_processors[plugin.TAG].pid):
-                    self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.__name__)
+                    self._logger.debug("'%s' is a valid phrase for plugin " + "'%s'", text, plugin.CATE+"_"+plugin.__name__)
                     try:
                         in_fp = self.in_fps[plugin.TAG]
                         son_processor = self.son_processors[plugin.TAG]
                         plugin.send_handle(text,in_fp,son_processor,self.speaker)
                     except Exception:
-                        self._logger.error('Failed to send valid word %s to pipe for %s', text,plugin.__name__,exc_info=True)
+                        self._logger.error('Failed to send valid word %s to pipe for %s', text,plugin.CATE+"_"+plugin.__name__,exc_info=True)
                         #self.speaker.say("遇到一些麻烦，请重试一次")
                     else:
-                        self._logger.debug("Send Pipe Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.__name__)
+                        self._logger.debug("Send Pipe Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.CATE+"_"+plugin.__name__)
                     finally:
                         return
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
@@ -167,7 +167,7 @@ class Bootstrap(object):
     @classmethod
     def getPluginPid(cls,plugin):
         pid = None 
-        pid_path = os.path.join(lib.appPath.DATA_PATH, plugin.__name__+'.pid');
+        pid_path = os.path.join(lib.appPath.DATA_PATH, plugin.CATE+"_"+plugin.__name__+'.pid');
         if os.path.exists(pid_path):
             with open(pid_path,"r") as f:
                 pid = int(f.read())
