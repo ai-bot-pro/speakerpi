@@ -142,6 +142,7 @@ if __name__ == '__main__':
         peopleMonitor(logger,args)
         exit(0)
 
+
     if args.baiduGraphic:
         baiduGraphic(logger,args)
         exit(0)
