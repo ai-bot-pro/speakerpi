@@ -49,7 +49,9 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 <div align="center"><img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%"></div>
 
-3.从[这里](https://ibmtjbot.github.io/#gettj)下载TJBot的3D模型,当然如果你懂3DMax,学过工业设计,自己也可以diy一个机器人外壳；3D打印可以直接通过网上找商家打印。
+3.[摄像头安装](https://linux.cn/article-3650-1.html)
+
+4.从[这里](https://ibmtjbot.github.io/#gettj)下载TJBot的3D模型,当然如果你懂3DMax,学过工业设计,自己也可以diy一个机器人外壳；3D打印可以直接通过网上找商家打印。
 
 > 软件安装
 
