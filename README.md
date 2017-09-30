@@ -25,6 +25,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 8. 母对公，母对母，公对公彩排线10 * 2x3 （暂时只用前两者）
 9. 树莓pi * 1 (包括散热片，保护壳)
 10. 16G microSD卡(读卡器) * 1 (16G已经足够了，当然土豪们可以追求更大空间)  
+11. 移动充电电源 * 1  
 整体费用大概在1000+左右~ 发烧了。
 
 ### 软件
