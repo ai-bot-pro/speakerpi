@@ -38,9 +38,9 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 9. pocketsphix （开源语音识别工具，主要用于学习语音识别技术原理)
 
 ### Install
-1. 安装代码
-2. 修改配置
-3. 硬件设置
+1. 硬件设置
+2. 软件安装
+3. 修改配置
 4. 添加开机启动
 
 ### About
