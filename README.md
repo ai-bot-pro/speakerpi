@@ -89,6 +89,17 @@ gpg -a --export KEY | sudo apt-key add -
 将一上文件配置好后，修改成.yml的后缀
 
 > 添加开机启动
+```
+robot_dir="/home/pi/xiaoc"
+run=`ps -ef | grep "sh ${robot_dir}/run.sh" | grep -v grep`
+if [ x"$run" = x ];then
+  date=`date '+%Y%m%d%H%M%S'`
+  #rm_date=`date -d '2 days ago' +%Y%m%d`
+  nohup sh ${robot_dir}/run.sh E8:07:BF:01:33:19 > ${robot_dir}/log/robot.${date}.log 2>&1 &
+  #rm -f ${robot_dir}/log/robot.${rm_date}*.log
+fi
+```
+将以上代码追加至~/.bashrc中，然后重启
 
 ### About
 
