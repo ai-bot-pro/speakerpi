@@ -75,7 +75,7 @@ gpg -a --export KEY | sudo apt-key add -
 
 4.[安装opencv](https://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/)
 
-5.获取代码`git clone https://github.com/weedge/doubanFmSpeackerPi.git xiaoc`，通过pip安装对应lib包`cd xiaoc/lib && pip install -r requirements.txt`
+5.获取代码`cd ~ && git clone https://github.com/weedge/doubanFmSpeackerPi.git xiaoc`，通过pip安装对应lib包`cd xiaoc/lib && pip install -r requirements.txt`
 
 > 修改配置
 - baidu.yml-dist (百度ai api服务配置)
