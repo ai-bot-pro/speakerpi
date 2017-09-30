@@ -41,17 +41,52 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 ### Install
 > 硬件设置
 
-首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示:
+1.首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示:
 
 <div align="center"><img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"></div>
 
-LED和Servo的接线方式如下图所示：
+2.LED,Servo,USB Microphone的接入方式如下图所示：
 
 <div align="center"><img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%"></div>
 
+3.从[这里](https://ibmtjbot.github.io/#gettj)下载TJBot的3D模型,当然如果你懂3DMax,学过工业设计,自己也可以diy一个机器人外壳；3D打印可以直接通过网上找商家打印。
+
 > 软件安装
 
+1.烧录一个最新的[raspbian系统](https://downloads.raspberrypi.org/raspbian_latest)镜像到SD卡中，这里介绍的是不需要显示器和鼠标，直接在系统安装前设置好wifi配置，具体操作见这篇[文章](https://app.yinxiang.com/shard/s2/nl/452668/d10eb3bc-51ce-4ced-8754-61952de94d5b/)吧；
+
+2.更新pi的源的时候需要把/etc/apt/sources.list和/etc/apt/sources.list.d/raspi.list文件这两个文件同时更新了：
+```
+/etc/apt/sources.list
+deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+/etc/apt/sources.list.d/raspi.list
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main
+```
+
+如果update的过程中会出现:`GPG 错误：http://mirrors.tuna.tsinghua.edu.cn jessie Release: 由于没有公钥，无法验证下列签名： NO_PUBKEY 8B48AD6246925553 NO_PUBKEY 7638D0442B90D010 NO_PUBKEY CBF8D6FD518E17E1`,通过如下命令解决(KEY为对应的pubkey)：
+```
+gpg --keyserver pgpkeys.mit.edu --recv-key KEY
+gpg -a --export KEY | sudo apt-key add -
+```
+
+3.[设置蓝牙](https://www.raspberrypi.org/magpi/bluetooth-audio-raspberry-pi-3/)
+
+4.[安装opencv](https://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/)
+
+5.获取代码，通过pip安装对应lib包`pip install -r requirements.txt`
+
 > 修改配置
+- baidu.yml-dist (百度ai api服务配置)
+- bootstrap.yml-dist (引导配置)
+- douban.yml-dist（豆瓣插件配置）
+- gpio.yml-dist（GPIO配置，LED和Servo）
+- log.yml-dist （日志级别配置）
+- mail.yml-dist (邮件服务配置)
+- monitor.yml-dist（监控插件配置）
+- snowboy.yml-dist (唤醒词配置)  
+将一下文件配置好后，修改成.yml的后缀
 
 > 添加开机启动
 
