@@ -40,9 +40,9 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 ### Install
 1. 硬件设置  
-* 首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示：  
-<div align="center"><img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"></div>  
-* LED和Servo的接线方式如下图所示：  
+* 首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示:
+<div align="center"><img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"></div>
+* LED和Servo的接线方式如下图所示：
 <div align="center"><img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%"></div> 
 2. 软件安装
 3. 修改配置
