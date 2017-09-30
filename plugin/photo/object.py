@@ -36,18 +36,23 @@ def send_handle(text,in_fp,son_processor,speaker):
     if re.search(u'植物', text): detect_type = "plant"
     if re.search(u'动物', text): detect_type = "animal"
     if re.search(u'标志', text): detect_type = "logo"
-    
-    #拍照
-    img = PhotographCamera.photographToBytesIO()
 
-    #识别
-    res = baidu_graphic.detectImage(img,detect_type) if detect_type is not None else None
+    pid_file = os.path.join(lib.appPath.DATA_PATH, "monitor"+"_"+__name__+'.pid');
+    monitor_pid_cmd = " ".join(["find",lib.appPath.DATA_PATH,"-type f -name  monitor_*.pid"])
+    monitor_pid = os.popen(monitor_pid_cmd).readline()
+    if(monitor_pid == ""):
+        #拍照
+        img = PhotographCamera.photographToBytesIO()
+        #识别
+        res = baidu_graphic.detectImage(img,detect_type) if detect_type is not None else None
 
-    name = res['name'] if 'name' in res else None
-    if name is not None:
-        speaker.say("这个应该是"+name.encode("UTF-8"))
+        name = res['name'] if 'name' in res else None
+        if name is not None:
+            speaker.say("这个应该是"+name.encode("UTF-8"))
+        else:
+            speaker.say("没有识别出来，请放好点再试一次吧")
     else:
-        speaker.say("没有识别出来，请放好点再试一次吧")
+        speaker.say("正在监控中，请关了监控然后再试试吧")
 
     in_fp.close()
     son_processor.join()
