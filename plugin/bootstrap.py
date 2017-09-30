@@ -127,7 +127,7 @@ class Bootstrap(object):
                 if self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instruction']:
                     begin_instruction = self.config['plugins'][plugin.CATE][plugin.TAG]['begin_instruction']
                     begin_instruction = begin_instruction.split(",")
-                    if (any(text in phrase for phrase in begin_instruction)
+                    if (any(phrase in text for phrase in begin_instruction)
                             and self.getPluginPid(plugin) is None):
                         self._logger.debug("Create a process for plunin %s with input:%s", plugin, text)
                         self.son_processors[plugin.TAG],self.in_fps[plugin.TAG] = self.create_plugin_process(plugin,self.speaker)
