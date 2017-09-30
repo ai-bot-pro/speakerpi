@@ -3,7 +3,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 ### Introduce
 &emsp;&emsp;douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个TJBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it~！  
-&emsp;&emsp;如果按照歌曲大概的结构来分的话(前奏 - 主歌 - Pre-Chorus - 副歌 - 间奏 - 主歌 - 副歌 - 桥段 - 副歌 - 结尾)；以上是前奏，副歌是做一个doubanFM一样的功能；主旋律是(ˇˍˇ)做一个小智能机器人(小C/weedge)  
+&emsp;&emsp;如果按照歌曲大概的结构来分的话(前奏 - 主歌 - Pre-Chorus - 副歌 - 间奏 - 主歌 - 副歌 - 桥段 - 副歌 - 结尾)；以上是前奏，副歌是做一个doubanFM一样的功能；主旋律是(ˇˍˇ)做一个小智能机器人(小C/weedge)。(ps: [robot指挥家](https://en.softonic.com/articles/the-robot-conducted-an-18-piece-orchestra-in-italy/?utm_medium=push&utm_source=features&utm_campaign=robot-news) diao!)    
 <div align="center">`听说听一个人的歌单，可以了解这个人的性格`</div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka0pfgbfj20ku0rs0xa.jpg" width="70%" height="70%"></div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fgy1fjka6epgtcj20ku0fmjud.jpg" width="70%" height="70%"></div>
@@ -25,6 +25,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 8. 母对公，母对母，公对公彩排线10 * 2x3 （暂时只用前两者）
 9. 树莓pi * 1 (包括散热片，保护壳)
 10. 16G microSD卡(读卡器) * 1 (16G已经足够了，当然土豪们可以追求更大空间)  
+11. 移动充电电源 * 1  
 整体费用大概在1000+左右~ 发烧了。
 
 ### 软件
@@ -78,7 +79,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 - [ ] 8.监控(当系统资源大于某个阈值自我报警/修复，比如cpu,磁盘,内存空间,网路阻塞/不通)
 - [ ] 9.配置读取加上缓存(系统启动初始的时候，将配置文件中的数据放入缓存中,减少不必要的i/o操作)
 - [ ] 10.现在只在pi+Raspbian(linux)系统上可以运行，后续对MacOS,Windos做兼容(Mac下带个耳机开个麦,然后来语句"播放豆瓣电台",声音发指令,nice)
-- [x] 11.串行启动,异步执行，通过daemon进程来运行唤醒的plugin进程, 引导唤醒插件的进程作为管理进程。
+- [x] 11.指令唤醒启动,异步执行，通过daemon进程来运行唤醒的plugin进程, 引导唤醒插件的进程作为管理进程。
 	（注意程序不要出现僵尸进程,一旦系统内部Zombie Process多了，系统运行就会受到影响了，如果调试遇到僵尸，可能用函数的姿势不对。`ps -el`看出的进程状态S如果是Z,则为僵尸,也可以通过`ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]`命令查看；僵尸进程为2种情况:  
 	1. 父死子活，这种情况内核会将这些子进程的父亲变为init进程(转变的过程中，该子进程就是个僵尸，当找到init父亲了，又活了，这个微妙的过程可以通过top查看到),这样子进程退出，资源释放有init进程完成，不会产生僵尸进程了。  
 	2. 小孩死了老爸不管就变僵尸了，这种情况子进程死了，父进程没有获取子进程留下的需要父进程知道的信息(比如内核进程栈信息，线程相关信息)(没有调用wait/waitpid)，或者其父进程没有通知内核对该进程的信息不感兴趣(没有调用signal(SIGCHLD,SIG_IGN)),这样就变成僵尸了。  
