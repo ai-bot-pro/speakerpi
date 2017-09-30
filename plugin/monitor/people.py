@@ -130,7 +130,7 @@ class PeopleMonitor(AbstractClass):
                     break
 
     def dispatch_command_callback(self,text):
-        command = 'p'
+        command = ''
         if re.search(u'结束人体监控', text): command = "exit"
-        if re.search(u'关闭豆瓣电台', text): command = "exit"
+        if re.search(u'关闭人体监控', text): command = "exit"
         return command

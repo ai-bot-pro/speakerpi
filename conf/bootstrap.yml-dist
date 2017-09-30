@@ -33,7 +33,8 @@ plugins:
             begin_instruction: "打开人体监控,开始人体监控"
             instruction: ""
             over_instruction: "关闭人体监控,结束人体监控"
-    photo: object:
+    photo: 
+        object:
             #相当于短插件会话链接
             begin_instruction: "这是什么菜品,这是什么车,这是什么植物,这是什么动物,这是什么标志"
             instruction: ""

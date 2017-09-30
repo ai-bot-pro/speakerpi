@@ -2,6 +2,7 @@
 # use picamera 
 # look this: http://picamera.readthedocs.io/en/release-1.2/recipes1.html
 import io
+import os
 import time
 import struct
 import socket
@@ -11,6 +12,8 @@ from imutils.video.pivideostream import PiVideoStream
 import imutils
 import numpy as np
 import cv2
+
+import lib.appPath
 
 class VideoCamera(object):
     def __init__(self, flip = False):
@@ -93,6 +96,13 @@ class PhotographCamera(object):
             time.sleep(2)
             camera.capture(stream, format='jpeg')
         # "Rewind" the stream to the beginning so we can read its content
+        stream.seek(0)
+
+        # save
+        image = Image.open(stream)
+        image_file = os.path.join(lib.appPath.DATA_PATH, 'photo.jpg');
+        image.save(image_file)
+
         stream.seek(0)
         return stream.read()
     

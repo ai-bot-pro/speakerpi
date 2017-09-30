@@ -69,6 +69,9 @@ class BaiduGraphic(AbstractClass):
             else:
                 res = detector[detect_type](image)
             self._logger.debug("detect %s result: %s",detect_type,json.dumps(res,encoding="UTF-8",ensure_ascii=False))
+            if("error_code" in res):
+                self._logger.warning("detect %s error: %s - %s",detect_type,res['error_code'],res['error_msg'])
+                return None
             if(type(res['result']) is dict):
                 return res['result']
             if(len(res['result'])>0 and type(res['result']) is list):
