@@ -39,8 +39,11 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 9. pocketsphix （开源语音识别工具，主要用于学习语音识别技术原理)
 
 ### Install
-1. 硬件设置  
-&emsp;&emsp;. led:可以参考tjbot控制led的步骤-[Use-Your-Voice-to-Control-a-Light-With-Watson](http://www.instructables.com/id/Use-Your-Voice-to-Control-a-Light-With-Watson/)  
+1. 硬件设置
+&emsp;&emsp;首先需要了解下GPIO的结构图,(通过`gpio readall`命令查看对应开发版上的pin和BCM)：
+<img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"> 
+&emsp;&emsp;LED和Servo的接线方式如下图所示：
+<img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%">
 2. 软件安装
 3. 修改配置
 4. 添加开机启动
