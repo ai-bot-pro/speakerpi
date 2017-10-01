@@ -30,7 +30,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 ### 软件
 1. jasper-client （用python写的语音交互(client)系统，采用单进程的方式管理插件，不能满足多指令同时交互)
-2. jtbot （用node.js写的语音交互client系统，从外观设计到调用的语音服务api，整套服务都有,后续可能用nodejs重新写一个版本，主要是用[asyncawait](https://github.com/yortus/asyncawait)这个模块来实现事件的异步处理)
+2. jtbot （用node.js写的语音交互client系统，从外观设计到调用的语音服务api，整套服务都有,后续可能用nodejs重新写一个版本，主要是用[asyncawait](https://github.com/yortus/asyncawait)这个模块来实现事件的异步处理,python需要3.4+才能用asyncio库)
 3. pi的操作系统NOOBS
 4. xiaoc（client) (用Python写的client交互系统，采用引导进程来管理多个插件子进程，通过管道通信)
 5. opencv （图像视频处理使用的库，提供训练级联分类器）
