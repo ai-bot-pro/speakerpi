@@ -83,6 +83,7 @@ gpg -a --export KEY | sudo apt-key add -
 - baidu.yml-dist (百度ai api服务配置)
 - bootstrap.yml-dist (引导配置)
 - douban.yml-dist（豆瓣插件配置）
+- feed.yml-dist（播报咨询feed(rss)插件配置,包括机器之心,今日头条新闻...etc）
 - gpio.yml-dist（GPIO配置，LED和Servo）
 - log.yml-dist （日志级别配置）
 - mail.yml-dist (邮件服务配置)
@@ -113,7 +114,7 @@ fi
 - [x] 音量控制: 安静,声音大一点,声音再小一点,打开声音,声音小一点,声音小点,声音在小一点,声音大点,静音,声音在大一点,声音再大一点 
 - [ ] 朗读诗歌
 - [ ] 当前时间
-- [ ] 新闻播报
+- [x] 新闻播报：阅读机器之心新闻，阅读下一条,下一条,更新新闻,关闭阅读,结束阅读
 - [ ] 天气播报
 - [ ] 生日祝福
 - [ ] todolist
