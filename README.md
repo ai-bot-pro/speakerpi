@@ -10,8 +10,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fly1fjztskocpxj208w06ogls.jpg" width="70%" height="70%"></div>
 
 ### Thinking (mind mapping)
-人机交互(Server): 架构合理设计(骨架)，组件性能优化(器官)，业务逻辑抽象(肉体)，策略方案得当(思维)，数据深度挖掘(血液)，通俗易懂的api(颜值要高,HAL/REST/graphQL)  
-人机交互(Client): 交互简单，易用，便捷，高效；解决日常生活(吃穿住行,娱乐,监控)之琐碎，"懒"出新高度
+- 人机交互(Server): 架构合理设计(骨架)，组件性能优化(器官)，业务逻辑抽象(肉体)，策略方案得当(思维)，数据深度挖掘(血液)，通俗易懂的api(颜值要高,HAL/REST/graphQL)，高效信息沟通(IPC,RPC,消息队列,消息格式/协议可扩展)，物质基础牢靠(IDC，VPC)  
+- 人机交互(Client): 交互简单，易用，便捷，高效；解决日常生活(吃穿住行,娱乐,监控)之琐碎，"懒"出新高度
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
 
 ### 硬件
@@ -30,8 +30,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 ### 软件
 1. jasper-client （用python写的语音交互(client)系统，采用单进程的方式管理插件，不能满足多指令同时交互)
-2. jtbot （用node.js写的语音交互client系统，从外观设计到调用的语音服务api，整套服务都有)
-3. pi的操作系统NOOBS
+2. TJbot （用node.js写的语音交互client系统，从外观设计到调用的语音服务api，整套服务都有(waston)。后续可能用nodejs重新写一个版本，主要是用[asyncawait](https://github.com/yortus/asyncawait)这个模块来实现事件的异步处理,python需要3.4+才能用asyncio库)
+3. pi的操作系统raspbian/NOOBS
 4. xiaoc（client) (用Python写的client交互系统，采用引导进程来管理多个插件子进程，通过管道通信)
 5. opencv （图像视频处理使用的库，提供训练级联分类器）
 6. baidu-ai (调用ai提供的服务)
@@ -39,11 +39,69 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 9. pocketsphix （开源语音识别工具，主要用于学习语音识别技术原理)
 
 ### Install
-1. 硬件设置  
-&emsp;&emsp;. led:可以参考tjbot控制led的步骤-[Use-Your-Voice-to-Control-a-Light-With-Watson](http://www.instructables.com/id/Use-Your-Voice-to-Control-a-Light-With-Watson/)  
-2. 软件安装
-3. 修改配置
-4. 添加开机启动
+> 硬件设置
+
+1.首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示:
+
+<div align="center"><img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"></div>
+
+2.LED,Servo,USB Microphone的接入方式如下图所示：
+
+<div align="center"><img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%"></div>
+
+3.[摄像头安装](https://linux.cn/article-3650-1.html)
+
+4.从[这里](https://ibmtjbot.github.io/#gettj)下载TJBot的3D模型,当然如果你懂3DMax,学过工业设计,自己也可以diy一个机器人外壳；3D打印可以直接通过网上找商家打印。
+
+> 软件安装
+
+1.烧录一个最新的[raspbian系统](https://downloads.raspberrypi.org/raspbian_latest)镜像到SD卡中，这里介绍的是不需要显示器和鼠标，直接在系统安装前设置好wifi配置，具体操作见这篇[文章](https://app.yinxiang.com/shard/s2/nl/452668/d10eb3bc-51ce-4ced-8754-61952de94d5b/)吧；
+
+2.更新pi的源的时候需要把/etc/apt/sources.list和/etc/apt/sources.list.d/raspi.list文件这两个文件同时更新了：
+```
+/etc/apt/sources.list
+deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+/etc/apt/sources.list.d/raspi.list
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main
+```
+
+如果update的过程中会出现:`GPG 错误：http://mirrors.tuna.tsinghua.edu.cn jessie Release: 由于没有公钥，无法验证下列签名： NO_PUBKEY 8B48AD6246925553 NO_PUBKEY 7638D0442B90D010 NO_PUBKEY CBF8D6FD518E17E1`,通过如下命令解决(KEY为对应的pubkey)：
+```
+gpg --keyserver pgpkeys.mit.edu --recv-key KEY
+gpg -a --export KEY | sudo apt-key add -
+```
+
+3.[设置蓝牙](https://www.raspberrypi.org/magpi/bluetooth-audio-raspberry-pi-3/)
+
+4.[安装opencv](https://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/)
+
+5.获取代码`cd ~ && git clone https://github.com/weedge/doubanFmSpeackerPi.git xiaoc`，通过pip安装对应lib包`cd xiaoc/lib && pip install -r requirements.txt`
+
+> 修改配置
+- baidu.yml-dist (百度ai api服务配置)
+- bootstrap.yml-dist (引导配置)
+- douban.yml-dist（豆瓣插件配置）
+- gpio.yml-dist（GPIO配置，LED和Servo）
+- log.yml-dist （日志级别配置）
+- mail.yml-dist (邮件服务配置)
+- monitor.yml-dist（监控插件配置）
+- snowboy.yml-dist (唤醒词配置)  
+将一上文件配置好后，修改成.yml的后缀
+
+> 添加开机启动
+```
+robot_dir="/home/pi/xiaoc"
+run=`ps -ef | grep "sh ${robot_dir}/run.sh" | grep -v grep`
+if [ x"$run" = x ];then
+  date=`date '+%Y%m%d%H%M%S'`
+  #rm_date=`date -d '2 days ago' +%Y%m%d`
+  nohup sh ${robot_dir}/run.sh E8:07:BF:01:33:19 > ${robot_dir}/log/robot.${date}.log 2>&1 &
+  #rm -f ${robot_dir}/log/robot.${rm_date}*.log
+fi
+```
+将以上代码追加至~/.bashrc中，然后重启
 
 ### About
 
@@ -71,7 +129,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 
 **todo**
 - [x] 1.豆瓣电台播放下一首、喜欢、不喜欢、不再播放/删除等指令的实现,机制一样(暂时不实现调用写接口写入喜欢数据和播放数据，一般都做了特殊处理，需要权限验证，后续抓下包仔细研究下;分享)
-- [ ] 2.下载指令的实现，看是否能用百度云的上传接口(亚马逊的Alexa可以提供音频文件上传)，如果不行只能在pi上加一个外设硬盘来本地存放，后期手动传到云端（音乐有版权问题，不能乱传）
+- [ ] 2.下载/离线播放指令的实现，暂存至本地（音乐有版权问题，不能乱传）
 - [x] 3.模拟登陆，播放豆瓣推荐的个性化歌曲(1.直接模拟登陆，不过需要验证码，这个通过文字识别接口，识别率好像不高，只能手动在后台填入，登陆后，保存cookie文件，下次使用，cookie过期时间一般比较长，所以可以用一段时间；2.直接将cookie文件保存在云端，直接从云端获取cookie直接来调用豆瓣接口；这个cookie如果过期了，需要重新上传更新cookie文件。其实2者原理一样。)
 - [ ] 4.还有种登陆的方法: 发验证图片的地址到手机上(如果是app提供聊天功能，可以利用消息上行接口实现)，然后语音识别录入登陆
 - [x] 5.加入唤醒基础功能(snowboy,pockectsphinx)
@@ -86,8 +144,8 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 	2. 小孩死了老爸不管就变僵尸了，这种情况子进程死了，父进程没有获取子进程留下的需要父进程知道的信息(比如内核进程栈信息，线程相关信息)(没有调用wait/waitpid)，或者其父进程没有通知内核对该进程的信息不感兴趣(没有调用signal(SIGCHLD,SIG_IGN)),这样就变成僵尸了。  
 	&emsp;&emsp;两次fork()创建守护进程,这样子进程和爷进程detach,父进程修改子进程工作目录,新建会话，修改工作目录的umask,然后退出，子进程重定向输入流、输出流、标准错误，内核回将该子进程的父进程变为init进程，这样不会出现僵尸啦~ 当然init进程是kill不掉的，因为对于init进程系统内核处理SIGKILL这个信号时忽略了，init进程不可杀并不是用户空间的策略，而是内核的机制，扯远了，有点蛋疼。  
 	&emsp;&emsp;了解init系统发展[点这里](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html),现在大多是systemd
-- [x] 12.进程之间的交互(IPC)，可以通过信号(SIG*)，管道(pipe，父子之间通信;命名管道(FIFO),通信分流，一对多的通信)，信号量(Semaphore,进程中线程之间的通信)，共享存储(分配在栈之下),消息队列(相对pipe效率要低点，主要用在没有直接关系的进程之间的通信)。详细介绍可以复习下APUE这本书中的介绍(书中概念还是要结合实际操作，不然光看没卵用，过段时间总会模糊的)，系统函数说明结合man/info了解；这里说的本地进程，采用两种方案：  
-		1、唤醒进程为父进程，plugin进程为子进程，父子之间的通信适合pipe来处理,如果子进程必须block运行时，采用父进程通过系统发送信号给子进程进行中断等(SIG*)操作；  
+- [x] 12.进程之间的交互(IPC)，可以通过信号(SIG*)，管道(pipe，父子之间通信;命名管道(FIFO),通信分流，一对多的通信)，信号量(Semaphore,进程中线程之间的通信)，共享存储(分配在栈之下),消息队列(相对pipe效率要低点，主要用在没有直接关系的进程之间的通信)。详细介绍可以复习下APUE这本书中的介绍(书中概念还是要结合实际操作，不然光看没卵用，过段时间总会模糊的)，系统函数说明结合man/info了解；这里说的本地进程，采用两种方案:  
+		1、唤醒进程为父进程，plugin进程为子进程，父子之间的通信适合pipe来处理,如果子进程必须block运行时，采用父进程通过系统发送信号给子进程进行中断等(SIG*)操作;  
 		2、唤醒进程和plugin进程互为兄弟进程，兄弟间进程交互选用FIFO/消息队列通信。  
 		&emsp;&emsp;其实这个可以延伸到网络IPC,分布式进程之间的通信(socket)：RPC协议框架、进程之间需要异步处理，采用分布式消息中间件Queue(p2p)/Topic(pubsub) 进行通信,有利于系统模块的解耦.  
 		&emsp;&emsp;多个进程通过pipe/queue交互调试时，可以2个进程模块之间单独调试，然后整体联调.  
