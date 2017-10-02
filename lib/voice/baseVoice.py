@@ -5,6 +5,8 @@ import logging
 import pipes
 import tempfile
 import subprocess
+import psutil
+import signal
 from abc import ABCMeta, abstractmethod
 
 import yaml
@@ -52,14 +54,64 @@ class AbstractVoiceEngine(object):
     def transcribe(self, fp):
         pass
 
-    def play(self, filename):
+    def play(self, filename,tag=None):
+        '''
+        tag: 给调用播放语音的speaker进程打个标签
+        '''
         cmd = ['play', str(filename)]
         self._logger.debug('Executing %s', ' '.join([pipes.quote(arg)
                                                      for arg in cmd]))
         with tempfile.TemporaryFile() as f:
-            subprocess.call(cmd, stdout=f, stderr=f)
+            self._play_process = subprocess.Popen(cmd,stdout=f,stderr=f,preexec_fn=os.setsid)
+            self._logger.debug("play pid: '%d'", self._play_process.pid)
+
+            pid_name = self.__class__.__name__+"_"+tag+"_play.pid" if tag is not None else self.__class__.__name__+"_play.pid"
+            pid_file = os.path.join(lib.appPath.DATA_PATH,pid_name)
+            with open(pid_file, 'w') as pid_fp:
+                pid_fp.write(str(self._play_process.pid))
+                pid_fp.close()
+
+            self._play_process.wait()
+
+            #播放完删除
+            if os.path.exists(pid_file):
+                os.remove(pid_file)
+
             f.seek(0)
             output = f.read()
             if output:
                 self._logger.debug("Output was: '%s'", output)
 
+    def kill_play_procsss(self,tag=None):
+        pid_name = self.__class__.__name__+"_"+tag+"_play.pid" if tag is not None else self.__class__.__name__+"_play.pid"
+        pid_file = os.path.join(lib.appPath.DATA_PATH,pid_name)
+        if os.path.exists(pid_file):
+            with open(pid_file, 'r') as f:
+                pid = int(f.read())
+                f.close()
+                if pid: 
+                    self._logger.debug("pgkill play pid: %d",pid)
+                    os.killpg(pid,signal.SIGKILL)
+
+    def suspend_play_process(self,tag=None):
+        res = None
+        pid_name = self.__class__.__name__+"_"+tag+"_play.pid" if tag is not None else self.__class__.__name__+"_play.pid"
+        pid_file = os.path.join(lib.appPath.DATA_PATH,pid_name)
+        with open(pid_file, 'r') as f:
+            pid = int(f.read())
+            f.close()
+            if pid: 
+                self._logger.debug("suspend play pid: %d",pid)
+                res = psutil.Process(pid).suspend()
+        return res
+
+    def resume_play_process(self,tag=None):
+        pid_name = self.__class__.__name__+"_"+tag+"_play.pid" if tag is not None else self.__class__.__name__+"_play.pid"
+        pid_file = os.path.join(lib.appPath.DATA_PATH,pid_name)
+        with open(pid_file, 'r') as f:
+            pid = int(f.read())
+            f.close()
+            if pid: 
+                self._logger.debug("resume play pid: %d",pid)
+                res = psutil.Process(pid).resume()
+        return res

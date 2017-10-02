@@ -17,6 +17,8 @@ import plugin.volume.pulseAudio
 from plugin.fm.doubanFM import DoubanFM
 from lib.mail import SMTPMail
 from plugin.monitor.people import PeopleMonitor
+from plugin.feeds.jiqizhixin import JiqizhixinFeed
+import plugin.feeds.jiqizhixin
 
 def doubanFM(logger,args):
     speaker = BaiduVoice.get_instance()
@@ -106,6 +108,55 @@ def baiduGraphic(logger,args):
 
     logger.debug("debug baiduGraphic is over")
 
+def jiqizhixinFeed(logger,args):
+    speaker = BaiduVoice.get_instance()
+
+    out_pipe, in_pipe = Pipe(True)
+    
+    son_p = Process(target=Bootstrap.son_process, 
+                args=(speaker, (out_pipe, in_pipe),
+                plugin.feeds.jiqizhixin.son_process_handle,False))
+
+    son_p.start()
+
+    # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
+    out_pipe.close()
+
+    debug_words = [
+            u"阅读机器之心新闻",
+            u"阅读下一条", 
+            u"下一条", 
+            u"下一条", 
+            u"结束阅读",
+        ]
+    for text in debug_words:
+        is_valid = plugin.feeds.jiqizhixin.isValid(text)
+        if is_valid is True:
+            if any(word in text for word in [u'结束阅读',u'阅读机器之心']):
+                time.sleep(60)
+
+            plugin.feeds.jiqizhixin.send_handle(text,in_pipe,son_p,speaker)
+
+            if any(word in text for word in [u'结束阅读']): break
+
+            time.sleep(7)
+        else:
+            print("word %s is not valid" % text)
+
+    in_pipe.close()
+    son_p.join()
+
+    '''
+    instance = JiqizhixinFeed.get_instance()
+    instance.set_speaker(speaker)
+    instance.update_feeds()
+    ct = instance.get_feeds_count()
+    for i in range(0,ct):
+        instance.get_next_feed()
+    '''
+
+    logger.debug("debug jiqizhixinFeed is over")
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='debug')
     parser.add_argument('--debug', action='store_true',
@@ -120,6 +171,8 @@ if __name__ == '__main__':
                         help='Show debug people monitor plugin messages')
     parser.add_argument('--baiduGraphic', action='store_true',
                         help='Show debug baidu graphic lib messages')
+    parser.add_argument('--jiqizhixinFeed', action='store_true',
+                        help='Show debug jiqizhixinFeed plugin messages')
 
     args = parser.parse_args()
     logging.basicConfig(stream=sys.stdout)
@@ -142,7 +195,10 @@ if __name__ == '__main__':
         peopleMonitor(logger,args)
         exit(0)
 
-
     if args.baiduGraphic:
         baiduGraphic(logger,args)
+        exit(0)
+
+    if args.jiqizhixinFeed:
+        jiqizhixinFeed(logger,args)
         exit(0)

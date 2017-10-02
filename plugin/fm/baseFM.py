@@ -46,8 +46,7 @@ class AbstractFM(AbstractClass):
             if output:
                 self._logger.debug("Output was: '%s'", output)
 
-    @classmethod
-    def kill_mplay_procsss(cls):
+    def kill_mplay_procsss(self):
         '''
         kill当前播放的mplay进程 （进程id从文件中获取）
         '''
@@ -55,16 +54,12 @@ class AbstractFM(AbstractClass):
         if os.path.exists(pid_file):
             with open(pid_file, 'r') as f:
                 pid = int(f.read())
-                print("-----")
-                print(pid_file)
-                print("-----")
                 f.close()
                 if pid: 
-                    print("pgkill mplay pid: %d"%pid)
+                    self._logger.debug("pgkill mplay pid: %d",pid)
                     os.killpg(pid,signal.SIGKILL)
     
-    @classmethod
-    def suspend_mplay_process(cls):
+    def suspend_mplay_process(self):
         '''
         挂起当前播放的mplay进程 （进程id从文件中获取）
         '''
@@ -72,29 +67,22 @@ class AbstractFM(AbstractClass):
         pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
         with open(pid_file, 'r') as f:
             pid = int(f.read())
-            print("---suspend--")
-            print(pid_file)
-            print("-----")
             f.close()
             if pid: 
-                print("suspend mplay pid: %d"%pid)
+                self._logger.debug("suspend mplay pid: %d",pid)
                 res = psutil.Process(pid).suspend()
         return res
     
-    @classmethod
-    def resume_mplay_process(cls):
+    def resume_mplay_process(self):
         '''
         唤醒当前播放的mplay进程 （进程id从文件中获取）
         '''
         pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
         with open(pid_file, 'r') as f:
             pid = int(f.read())
-            print("---resume--")
-            print(pid_file)
-            print("-----")
             f.close()
             if pid: 
-                print("resume mplay pid: %d"%pid)
+                self._logger.debug("resume mplay pid: %d",pid)
                 res = psutil.Process(pid).resume()
         return res
 

@@ -83,6 +83,6 @@ class Conversation(object):
                     #直接将识别的指令发给bootstrap引导模块处理
                     self.bootstrap.query(input)
             else:
-                self.speaker.say("没听清楚，请再说一次")
+                self.speaker.say("没听清楚您说什么")
 
         self.passive_mic.terminate()

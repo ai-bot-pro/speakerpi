@@ -4,7 +4,6 @@ passive_stt_engine: "snowboy"
 active_stt_engine: "baidu-ai-voice"
 #语音合成: tag
 speak_engine: "baidu-ai-voice"
-
 #是否启用通过GPIO控制的外设,默认不开启为no;开启为yes
 robot_open_shake_bling: "no"
 
@@ -17,25 +16,31 @@ plugins:
     #   ...
     fm:
         douban:
-            #相当于长插件会话链接
+            #长插件会话
             begin_instruction: "播放豆瓣电台"
             instruction: "下一首,暂停,继续播放, 喜欢这首歌, 不喜欢这首歌, 删除这首歌, 不再播放这首歌, 不在播放这首歌, 播放到我的私人频道,切换到我的私人频道, 我的私人频道, 私人频道, 播放红心歌单, 切换到红心电台, 切换到红心歌单, 红心歌单, 红心电台, 播放红星歌单, 切换到红星电台, 切换到红星歌单, 红星歌单, 红星电台,下载, 下载这首歌"
             over_instruction: "关闭豆瓣电台,结束豆瓣电台"
     volume: 
         pulseAudio:
-            #相当于短插件会话链接
+            #短插件会话
             begin_instruction: "声音大点,声音大一点,声音再大一点,声音在大一点,声音小点,声音小一点,声音再小一点,声音在小一点,静音,安静,打开声音"
             instruction: ""
             over_instruction: ""
     monitor:
         people:
-            #相当于长插件会话链接
+            #长插件会话
             begin_instruction: "打开人体监控,开始人体监控"
             instruction: ""
             over_instruction: "关闭人体监控,结束人体监控"
     photo: 
         object:
-            #相当于短插件会话链接
+            #短插件会话
             begin_instruction: "这是什么菜品,这是什么车,这是什么植物,这是什么动物,这是什么标志"
             instruction: ""
             over_instruction: ""
+    feeds:
+        #机器之心
+        jiqizhixin:
+            begin_instruction: "阅读机器之心新闻"
+            instruction: "阅读下一条,下一条,更新新闻"
+            over_instruction: "关闭阅读,结束阅读"

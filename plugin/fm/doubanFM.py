@@ -15,6 +15,7 @@ import psutil
 import yaml
 
 import lib.appPath
+import lib.diagnose
 from baseFM import AbstractFM
 
 from lib.gpio.manager import Manager as gpioManager
@@ -100,7 +101,6 @@ def send_handle(text,in_fp,son_processor,speaker):
         DoubanFM.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
         in_fp.close()
-        DoubanFM.kill_mplay_procsss()
         #相当于执行os.waitpid(son_processor.pid)等待资源回收
         son_processor.join()
         pid_file = os.path.join(lib.appPath.DATA_PATH, CATE+"_"+__name__+'.pid');

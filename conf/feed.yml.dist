@@ -1,0 +1,5 @@
+jiqizhixin:
+    #rss地址
+    rss_url: "https://www.jiqizhixin.com/rss"
+    #摘要
+    digest: "yes"
