@@ -94,15 +94,17 @@ gpg -a --export KEY | sudo apt-key add -
 > 添加开机启动
 ```
 robot_dir="/home/pi/xiaoc"
+bluetooth_mac=""
 run=`ps -ef | grep "sh ${robot_dir}/run.sh" | grep -v grep`
 if [ x"$run" = x ];then
   date=`date '+%Y%m%d%H%M%S'`
-  #rm_date=`date -d '2 days ago' +%Y%m%d`
-  nohup sh ${robot_dir}/run.sh E8:07:BF:01:33:19 > ${robot_dir}/log/robot.${date}.log 2>&1 &
+  mv ${robot_dir}/log/robot.log ${robot_dir}/log/robot.${date}.log
+  nohup sh ${robot_dir}/run.sh ${bluetooth_mac} > ${robot_dir}/log/robot.log 2>&1 &
+  rm_date=`date -d '2 days ago' +%Y%m%d`
   #rm -f ${robot_dir}/log/robot.${rm_date}*.log
 fi
 ```
-将以上代码追加至~/.bashrc中，然后重启
+将以上代码追加至~/.bashrc中，添加已经匹配信任好了的蓝牙MAC地址， 然后重启
 
 ### About
 
