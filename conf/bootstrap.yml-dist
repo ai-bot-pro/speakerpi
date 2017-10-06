@@ -41,6 +41,6 @@ plugins:
     feeds:
         #机器之心
         jiqizhixin:
-            begin_instruction: "阅读机器之心新闻"
+            begin_instruction: "阅读机器之心新闻,机器之心新闻,阅读机器之心,机器之心"
             instruction: "阅读下一条,下一条,更新新闻"
             over_instruction: "关闭阅读,结束阅读"

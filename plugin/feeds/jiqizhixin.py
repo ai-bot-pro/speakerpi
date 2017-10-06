@@ -136,7 +136,7 @@ class JiqizhixinFeed(AbstractClass):
 
     def _get_cdata(self,phase,filt_punctuation=False):
         rgx = re.compile("\<\!\[CDATA\[(.*?)\]\]\>")
-        r = rgx.search(phase)
+        r = rgx.search(phase.replace('\n',''))
         if r is not None:
             stripper = MLStripper()
             stripper.feed(r.group(1))
@@ -219,16 +219,21 @@ class JiqizhixinFeed(AbstractClass):
         return True
 
     def get_next_feed(self):
+        if(len(self.feeds)<self.offset):
+            return False
         self._logger.debug("get next feed %d",self.offset+1)
         self.offset = self.offset + 1
         return self._get_feed_to_speak()
 
     def get_next_action_feed(self):
+        if(len(self.feeds)<self.offset):
+            return False
         self.offset = self.offset + 1
         return self._get_feed_to_speak()
 
     def update_feeds(self):
         self.offset = 0
+        self.feeds = []
         return self._get_feeds()
 
     def start(self, get_text_callback,command_callback=None):
@@ -236,7 +241,6 @@ class JiqizhixinFeed(AbstractClass):
         while True:
             if (command_callback is not None and get_text_callback is not None):
                 try:
-                    self._logger.debug("-----start get text from pipe------")
                     text = get_text_callback()
                     if text is not None:
                         self._logger.debug("-----got text %s from pipe------",text)
