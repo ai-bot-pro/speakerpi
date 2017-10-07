@@ -31,15 +31,20 @@ def doubanFM(logger,args):
 def pulseAudio(logger,args):
     baidu_voice = BaiduVoice.get_instance()
 
-    out_pipe, in_pipe = Pipe(True)
+    out_to_fp, in_to_fp = Pipe(True)
+    out_from_fp, in_from_fp = Pipe(True)
     
     son_p = Process(target=Bootstrap.son_process, 
-                args=(baidu_voice, (out_pipe, in_pipe),
+                args=(baidu_voice, 
+                    (out_to_fp, in_to_fp),
+                    (out_from_fp, in_from_fp),
                 plugin.volume.pulseAudio.son_process_handle,False))
 
     son_p.start()
-    # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
-    out_pipe.close()
+    # 等to_pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
+    out_to_fp.close()
+    # 等from_pipe被fork 后，关闭主进程的输入端; 创建的Pipe一端连接着子进程的输入，一端连接着父进程的输出口
+    in_from_fp.close()
 
     words = [
             u"打开声音",
@@ -59,12 +64,13 @@ def pulseAudio(logger,args):
         is_valid = plugin.volume.pulseAudio.isValid(text)
         if is_valid is True:
             logger.debug("word %s is valid" % text)
-            plugin.volume.pulseAudio.send_handle(text,in_pipe,son_p,baidu_voice)
+            plugin.volume.pulseAudio.process_handle(text,in_to_fp,out_from_fp,son_p,baidu_voice)
             time.sleep(3)
         else:
             logger.debug("word %s is not valid" % text)
 
-    in_pipe.close()
+    in_to_fp.close()
+    out_from_fp.close()
     son_p.join()
 
     logger.debug("debug pulseAudio is over")
@@ -111,16 +117,21 @@ def baiduGraphic(logger,args):
 def jiqizhixinFeed(logger,args):
     speaker = BaiduVoice.get_instance()
 
-    out_pipe, in_pipe = Pipe(True)
+    out_to_fp, in_to_fp = Pipe(True)
+    out_from_fp, in_from_fp = Pipe(True)
     
     son_p = Process(target=Bootstrap.son_process, 
-                args=(speaker, (out_pipe, in_pipe),
+                args=(speaker,
+                    (out_to_fp, in_to_fp),
+                    (out_from_fp, in_from_fp),
                 plugin.feeds.jiqizhixin.son_process_handle,False))
 
     son_p.start()
 
-    # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
-    out_pipe.close()
+    # 等to_pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
+    out_to_fp.close()
+    # 等from_pipe被fork 后，关闭主进程的输入端; 创建的Pipe一端连接着子进程的输入，一端连接着父进程的输出口
+    in_from_fp.close()
 
     debug_words = [
             u"阅读机器之心新闻",
@@ -135,7 +146,7 @@ def jiqizhixinFeed(logger,args):
             if any(word in text for word in [u'结束阅读',u'阅读机器之心']):
                 time.sleep(60)
 
-            plugin.feeds.jiqizhixin.send_handle(text,in_pipe,son_p,speaker)
+            plugin.feeds.jiqizhixin.process_handle(text,in_to_fp,out_from_fp,son_p,speaker)
 
             if any(word in text for word in [u'结束阅读']): break
 
@@ -143,7 +154,8 @@ def jiqizhixinFeed(logger,args):
         else:
             print("word %s is not valid" % text)
 
-    in_pipe.close()
+    in_to_fp.close()
+    out_from_fp.close()
     son_p.join()
 
     '''

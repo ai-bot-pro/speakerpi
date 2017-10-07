@@ -129,55 +129,6 @@ def debugMic(logger,args):
 
     mic.terminate()
 
-def debugDoubanFm(logger=None,args=None):
-    baidu_voice = BaiduVoice.get_instance()
-
-    out_pipe, in_pipe = Pipe(True)
-    
-    son_p = Process(target=Bootstrap.son_process, 
-                args=(baidu_voice, (out_pipe, in_pipe),
-                plugin.fm.doubanFM.son_process_handle,False))
-
-    son_p.start()
-
-    # 等pipe被fork 后，关闭主进程的输出端; 创建的Pipe一端连接着主进程的输入，一端连接着子进程的输出口
-    out_pipe.close()
-
-    debug_words = [
-            u"播放豆瓣电台",
-            u"下一首", 
-            u"暂停",
-            u"继续播放",
-            #u"喜欢这首歌",
-            #u"不喜欢这首歌",
-            u"删除这首歌",
-            u"不再播放这首歌",
-            #u"下载",
-            #u"下载这首歌",
-            u"结束豆瓣电台",
-        ]
-
-    for text in debug_words:
-        is_valid = plugin.fm.doubanFM.isValid(text)
-        if is_valid is True:
-            if any(word in text for word in [u'结束豆瓣电台']):
-                #再睡6分钟是为了判断中间是否自然播放下首歌曲;然后在发送结束指令(unblock is ok)
-                time.sleep(360)
-
-            plugin.fm.doubanFM.send_handle(text,in_pipe,son_p,baidu_voice)
-
-            if any(word in text for word in [u'结束豆瓣电台']): break
-
-            #睡的时间尽量在30秒左右以上，因为子进程还在处理中（speaker的话比较多得时候），还未产生播放歌曲的进程id
-            time.sleep(60)
-        else:
-            print("word %s is not valid" % text)
-
-    in_pipe.close()
-    son_p.join()
-
-    print "debug doubanFM son process with pipe is over"
-
 def debugLedServo(logger,args):
     print("debugLedServo")
     gpioManager.shakeshake_blingbling(process_callback=None,

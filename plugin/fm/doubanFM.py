@@ -38,11 +38,13 @@ signal.signal(signal.SIGINT, signal_handler)
 TAG = 'douban'
 CATE = 'fm'
 
-def son_process_handle(speaker,get_text_callback):
+def son_process_handle(speaker,_in_to_fp,_out_from_fp,get_text_callback):
     '''
     子进程处理逻辑
     speaker: voice实例(tts)
-    get_text_callback: 获取文本指令回调函数
+    _in_to_fp: 子进程给父进程发消息的pipe 输入端(w)
+    _out_from_fp: 父进程给子进程发消息的pipe 输出端(r)
+    get_text_callback: 获取文本指令回调函数,可选用,由bootstrap来控制是否阻塞获取消息文本
     '''
     print("<<<<<<< begin douban fm son process handle >>>>>>>")
     speaker.say('开始播放豆瓣电台')
@@ -53,11 +55,12 @@ def son_process_handle(speaker,get_text_callback):
             play_command_callback=douban_fm.dispatch_command_callback,
             sleep_time=0.05)
 
-def send_handle(text,in_fp,son_processor,speaker):
+def process_handle(text,in_to_fp,out_from_fp,son_processor,speaker):
     '''
     发送指令给子进程处理(pipe,signal)
     text: 指令
-    in_fp: pipe 输入端
+    in_to_fp: 父进程给子进程发消息的pipe 输入端(w)
+    out_from_fp: 子进程给父进程发消息的pipe 输出端(r)
     son_processor: 子进程(Process 实例)
     speaker: voice实例(tts)
     '''
@@ -65,7 +68,7 @@ def send_handle(text,in_fp,son_processor,speaker):
 
     if all(word not in text for word in [u'暂停',u'继续播放',u'播放豆瓣电台',]):
         print("send valid word %s to pipe" % text.encode("UTF-8"))
-        in_fp.send(text)
+        in_to_fp.send(text)
 
     if (re.search(u'喜欢', text)):
         #喜欢、不喜欢不需要发信号给子进程，通过指令改变播放的type值为r or u,获取对应类型歌曲播放
@@ -101,7 +104,8 @@ def send_handle(text,in_fp,son_processor,speaker):
     if re.search(u'结束豆瓣电台', text) or re.search(u'关闭豆瓣电台', text):
         douban_fm.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
-        in_fp.close()
+        in_to_fp.close()
+        out_from_fp.close()
         #相当于执行os.waitpid(son_processor.pid)等待资源回收
         son_processor.join()
         pid_file = os.path.join(lib.appPath.DATA_PATH, CATE+"_"+__name__+'.pid');

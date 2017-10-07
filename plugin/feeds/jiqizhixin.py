@@ -22,13 +22,13 @@ except ImportError:
 TAG = 'jiqizhixin'
 CATE = 'feeds'
 
-def son_process_handle(speaker,get_text_callback):
+def son_process_handle(speaker,_in_to_fp,_out_from_fp,get_text_callback):
     '''
-    发送指令给子进程处理(pipe,signal)
-    text: 指令
-    in_fp: pipe 输入端
-    son_processor: 子进程(Process 实例)
+    子进程处理逻辑
     speaker: voice实例(tts)
+    _in_to_fp: 子进程给父进程发消息的pipe 输入端(w)
+    _out_from_fp: 父进程给子进程发消息的pipe 输出端(r)
+    get_text_callback: 获取文本指令回调函数,可选用,由bootstrap来控制是否阻塞获取消息文本
     '''
     print("<<<<<<< begin jiqizhixin feeds send pipe handle >>>>>>>")
     speaker.say('开始阅读机器之心新闻')
@@ -36,11 +36,12 @@ def son_process_handle(speaker,get_text_callback):
     jqzx_feeds.set_speaker(speaker)
     jqzx_feeds.start(get_text_callback=get_text_callback,command_callback=dispatch_command_callback)
 
-def send_handle(text,in_fp,son_processor,speaker):
+def process_handle(text,in_to_fp,out_from_fp,son_processor,speaker):
     '''
     发送指令给子进程处理(pipe,signal)
     text: 指令
-    in_fp: pipe 输入端
+    in_to_fp: 父进程给子进程发消息的pipe 输入端(w)
+    out_from_fp: 子进程给父进程发消息的pipe 输出端(r)
     son_processor: 子进程(Process 实例)
     speaker: voice实例(tts)
     '''
@@ -48,7 +49,7 @@ def send_handle(text,in_fp,son_processor,speaker):
 
     if all(word not in text for word in [u'阅读机器之心',]):
         print("send valid word %s to pipe" % text.encode("UTF-8"))
-        in_fp.send(text)
+        in_to_fp.send(text)
 
     if (re.search(u'下一条', text)):
         speaker.kill_play_procsss("_".join([CATE,TAG]))
@@ -57,7 +58,8 @@ def send_handle(text,in_fp,son_processor,speaker):
 
     if re.search(u'结束阅读', text) or re.search(u'关闭阅读', text):
         speaker.kill_play_procsss("_".join([CATE,TAG]))
-        in_fp.close()
+        in_to_fp.close()
+        out_from_fp.close()
         son_processor.join()
         pid_file = os.path.join(lib.appPath.DATA_PATH, CATE+"_"+__name__+'.pid');
         if os.path.exists(pid_file):
@@ -189,7 +191,8 @@ class JiqizhixinFeed(AbstractClass):
         
         if self.simple is True:
             #say_text = "".join([u"文章标题:",title,u";发布于:",pubDate,u";作者:",author,u";摘要如下:",description])
-            say_text = "".join([description])
+            #say_text = "".join([description])
+            say_text = "".join([u"文章:",title,u";发布于:",pubDate,u";作者:",author,u";",description])
             self.speaker.say(say_text,"_".join([CATE,TAG]))
             return True
         else:
