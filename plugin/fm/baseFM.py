@@ -50,7 +50,7 @@ class AbstractFM(AbstractClass):
         '''
         kill当前播放的mplay进程 （进程id从文件中获取）
         '''
-        pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
+        pid_file = os.path.join(lib.appPath.DATA_PATH,self.__class__.__name__+"_mplay.pid")
         if os.path.exists(pid_file):
             with open(pid_file, 'r') as f:
                 pid = int(f.read())
@@ -64,7 +64,7 @@ class AbstractFM(AbstractClass):
         挂起当前播放的mplay进程 （进程id从文件中获取）
         '''
         res = None
-        pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
+        pid_file = os.path.join(lib.appPath.DATA_PATH,self.__class__.__name__+"_mplay.pid")
         with open(pid_file, 'r') as f:
             pid = int(f.read())
             f.close()
@@ -77,7 +77,7 @@ class AbstractFM(AbstractClass):
         '''
         唤醒当前播放的mplay进程 （进程id从文件中获取）
         '''
-        pid_file = os.path.join(lib.appPath.DATA_PATH,cls.__name__+"_mplay.pid")
+        pid_file = os.path.join(lib.appPath.DATA_PATH,self.__class__.__name__+"_mplay.pid")
         with open(pid_file, 'r') as f:
             pid = int(f.read())
             f.close()

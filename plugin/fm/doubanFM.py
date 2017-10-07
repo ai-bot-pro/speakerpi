@@ -72,6 +72,7 @@ def send_handle(text,in_fp,son_processor,speaker):
         #todo: 加入写入数据（需要喜欢接口)
         speaker.say(text.encode("UTF-8")+"操作成功")
 
+    douban_fm = DoubanFM.get_instance()
     #父进程调用系统发信号给子进程
     if (re.search(u'下一首', text) 
             or re.search(u'红心', text) 
@@ -80,25 +81,25 @@ def send_handle(text,in_fp,son_processor,speaker):
             or re.search(u'删除', text) 
             or re.search(u'不在播放', text)
             or re.search(u'不再播放', text)):
-        DoubanFM.kill_mplay_procsss()
+        douban_fm.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
         speaker.say(text.encode("UTF-8")+"操作成功")
         time.sleep(3)
 
     if re.search(u'暂停', text):
-        DoubanFM.suspend_mplay_process()
+        douban_fm.suspend_mplay_process()
         gpioManager.suspend_process(TAG)
         speaker.say(text.encode("UTF-8")+"已经处理")
         time.sleep(1)
 
     if re.search(u'继续播放', text):
-        DoubanFM.resume_mplay_process()
+        douban_fm.resume_mplay_process()
         gpioManager.resume_process(TAG)
         speaker.say(text.encode("UTF-8")+"已经处理")
         time.sleep(1)
 
     if re.search(u'结束豆瓣电台', text) or re.search(u'关闭豆瓣电台', text):
-        DoubanFM.kill_mplay_procsss()
+        douban_fm.kill_mplay_procsss()
         gpioManager.kill_procsss(TAG)
         in_fp.close()
         #相当于执行os.waitpid(son_processor.pid)等待资源回收
