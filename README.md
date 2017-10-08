@@ -10,7 +10,7 @@ for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC 
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fly1fjztskocpxj208w06ogls.jpg" width="70%" height="70%"></div>
 
 ### Thinking (mind mapping)
-- 人机交互(Server): 架构合理设计(骨架)，组件性能优化(器官)，业务逻辑抽象(肉体)，策略方案得当(思维)，数据深度挖掘(血液)，通俗易懂的api(颜值要高,HAL/REST/graphQL)，高效信息沟通(IPC,RPC,消息队列,消息格式/协议可扩展)，物质基础牢靠(IDC，VPC)  
+- 人机交互(Server): 架构合理设计(骨架)，组件性能优化(器官)，业务逻辑抽象(肉体)，策略方案得当(思维)，数据深度挖掘(血液)，通俗易懂的api(颜值要高,HAL/REST/graphQL)，高效信息沟通(IPC,RPC,消息队列,消息格式/协议可扩展)，物质基础牢靠(IDC,VPC,资源管理,资源调度,作业调度)  
 - 人机交互(Client): 交互简单，易用，便捷，高效；解决日常生活(吃穿住行,娱乐,监控)之琐碎，"懒"出新高度
 <div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
 
