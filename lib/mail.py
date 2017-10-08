@@ -49,35 +49,35 @@ class SMTPMail(AbstractClass):
                 lib.diagnose.check_python_import('smtplib'))
 
     def _formatAddr(cls,s): 
-    	name, addr = parseaddr(s) 
-    	return formataddr((
-    		Header(name, 'utf-8').encode(),
-    		addr.encode('utf-8') if isinstance(addr, unicode) else addr))
+        name, addr = parseaddr(s) 
+        return formataddr((
+            Header(name, 'utf-8').encode(),
+            addr.encode('utf-8') if isinstance(addr, unicode) else addr))
 
     def sendImageEmail(self,image):
-    	msg = MIMEMultipart('related')
-    	msg['Subject'] = Header(u'来自机器人C(weedge)的邮件，请查看', 'utf-8').encode()
-    	msg['From'] = self._formatAddr(u'小C(weedge)  <%s>' % self.fromEmail)
-    	msg['To'] = self._formatAddr(u'主人邮箱 <%s>' % self.toEmail)
-    
-    	#邮件内容
-    	msg.attach(MIMEText('Hi,您好,监控文件见附件', 'plain', 'utf-8'))
-    
-    	#图片附件
-    	mime = MIMEBase('image', 'jpg', filename='img.jpg')
-    	# 加上必要的头信息:
-    	mime.add_header('Content-Disposition', 'attachment', filename='img.jpg')
-    	mime.add_header('Content-ID', '<0>')
-    	mime.add_header('X-Attachment-Id', '0')
-    	mime.set_payload(image)
-    	# 用Base64编码:
-    	encoders.encode_base64(mime)
-    	# 添加到MIMEMultipart:
-    	msg.attach(mime)
-    
-    	smtp = smtplib.SMTP(self.smtpServer, self.smtpPort)
-    	smtp.set_debuglevel(1)
-    	#smtp.starttls()
-    	smtp.login(self.fromEmail, self.fromEmailPassword)
-    	smtp.sendmail(self.fromEmail, self.toEmail, msg.as_string())
-    	smtp.quit()
+        msg = MIMEMultipart()
+        msg['Subject'] = Header(u'邮件', 'utf-8').encode()
+        msg['From'] = self._formatAddr(u'小C(weedge)  <%s>' % self.fromEmail)
+        msg['To'] = self._formatAddr(u'主人邮箱 <%s>' % self.toEmail)
+        
+        #邮件内容
+        msg.attach(MIMEText('Hi,您好,监控文件见附件', 'plain', 'utf-8'))
+        
+        #图片附件
+        mime = MIMEBase('image', 'jpg', filename='img.jpg')
+        # 加上必要的头信息:
+        mime.add_header('Content-Disposition', 'attachment', filename='img.jpg')
+        mime.add_header('Content-ID', '<0>')
+        mime.add_header('X-Attachment-Id', '0')
+        mime.set_payload(image)
+        # 用Base64编码:
+        encoders.encode_base64(mime)
+        # 添加到MIMEMultipart:
+        msg.attach(mime)
+        
+        smtp = smtplib.SMTP(self.smtpServer, self.smtpPort)
+        smtp.set_debuglevel(1)
+        #smtp.starttls()
+        smtp.login(self.fromEmail, self.fromEmailPassword)
+        smtp.sendmail(self.fromEmail, self.toEmail, msg.as_string())
+        smtp.quit()
