@@ -1,5 +1,5 @@
 # doubanFmSpeackerPi
-for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC -> Running xiaoC(+Lego Technic; like [this]( https://www.mi.com/toyblock/))); in the future, u can share robot like share bike/battery?
+&emsp;&emsp;for doubanFmPi demo  &amp;&amp;  for xiao_C ( FmSpeakerPi -> SpeakerPi -> xiaoC -> Running xiaoC(+Lego Technic; like [this]( https://www.mi.com/toyblock/))); in the future, u can share robot like share bike/battery?
 
 ### Introduce
 &emsp;&emsp;douban-FM.PI 主要是平时工作编码，休息的时候，经常听豆瓣电台的音乐；平时也关注人工智能相关的技术；加上现在人工智能-语音识别(包括唤醒)/合成技术逐渐成熟， 相关的平台服务相继开放给第三方开发者使用,对应电台的智能设备也越来越多; 加上树莓派刚出3的时候买了一个，当时只是把系统装了,了解下新功能；在网上找了下豆瓣电台好像没有对应的智能设备，于是乎自己尝试着整一个，学习下相关智能领域的知识，DIY一个桌面级的东东；买了一些外设(话筒，speaker(蓝牙播放器),LED,摄像头，Servo Motor,如果外带需要一个移动电源),还有一个TJBot的外壳，然后结合语音领域的云端服务api，以及豆瓣电台的api，豆瓣电台的api服务没有开放，需要抓包查看；既然软硬件都兼备了，just do it~！  
@@ -111,8 +111,8 @@ fi
 
 ***示例***
 
-***plugin***
-插件开发，因为需要插件进程和父进程(bootstrap进程)通过管道通信，分为两种情况：1.插件进程运行不需要轮训，运行完就可以结束，开发可参考[音量控制插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/volume)；2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)  
+### plugin
+&emsp;&emsp;插件开发，因为需要插件进程和父进程(bootstrap进程)通过管道通信，分为两种情况：1.插件进程运行不需要轮训，运行完就可以结束，开发可参考[音量控制插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/volume)；2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)  
 - [x] doubanfm: 播放豆瓣电台,下一首,暂停,继续播放, 喜欢这首歌, 不喜欢这首歌, 删除这首歌, 不再播放这首歌, 不在播放这首歌, 播放到我的私人频道,切换到我的私人频道, 我的私人频道, 私人频道, 播放红心歌单, 切换到红心电台, 切换到红心歌单, 红心歌单, 红心电台, 播放红星歌单, 切换到红星电台, 切换到红星歌单, 红星歌单, 红星电台,下载, 下载这首歌,关闭豆瓣电台,结束豆瓣电台
 - [x] 音量控制: 安静,声音大一点,声音再小一点,打开声音,声音小一点,声音小点,声音在小一点,声音大点,静音,声音在大一点,声音再大一点 
 - [ ] 朗读诗歌
@@ -131,7 +131,7 @@ fi
 &emsp;&emsp;Server in my Mac [photographToServerSocket.py](https://gist.github.com/weedge/f87e84805b1e646514e17c2a6b1c8978), [videoToPlayerFromServerSocket.py](https://gist.github.com/weedge/ee9c99baffac998123cb27ea083dec0c).
 
 
-**todo**
+### TODO
 - [x] 1.豆瓣电台播放下一首、喜欢、不喜欢、不再播放/删除等指令的实现,机制一样(暂时不实现调用写接口写入喜欢数据和播放数据，一般都做了特殊处理，需要权限验证，后续抓下包仔细研究下;分享)
 - [ ] 2.下载/离线播放指令的实现，暂存至本地（音乐有版权问题，不能乱传）
 - [x] 3.模拟登陆，播放豆瓣推荐的个性化歌曲(1.直接模拟登陆，不过需要验证码，这个通过文字识别接口，识别率好像不高，只能手动在后台填入，登陆后，保存cookie文件，下次使用，cookie过期时间一般比较长，所以可以用一段时间；2.直接将cookie文件保存在云端，直接从云端获取cookie直接来调用豆瓣接口；这个cookie如果过期了，需要重新上传更新cookie文件。其实2者原理一样。)
