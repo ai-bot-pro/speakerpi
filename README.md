@@ -116,7 +116,8 @@ fi
 ### plugin
 &emsp;&emsp;插件开发(后续的设计完善参考es插件(比如IK分词(感叹一下，在工程中经常用到的小插件关注度往往比小众软件系统要高的多，这也和对应的生态有关系，所以选择很重要？喜欢就好吧！))的管理，其实思路一样(工程上的实现方式有些差异))，因为需要插件进程和父进程(bootstrap进程)通过管道通信，分为两种情况：
 - 1.插件进程运行不需要轮训，运行完就可以结束，开发可参考[音量控制插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/volume)；
-- 2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)。  
+- 2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)。
+
 &emsp;&emsp;如果改成插件线程，可参考PHP中线程安全([ZTS](http://blog.codinglabs.org/articles/zend-thread-safety.html),想法借鉴就行了，至于它的实现。。。并发设计可以参考java中的java.util.concurrent并发框架包的实现)的设计想法；锁的底层实现是通过处理器提供的一个LOCK＃信号处理，两种机制来保证原子操作：总线锁，缓存锁；处理器提供了很多LOCK前缀的指令来实现，比如交换指令XADD,CMPXCHG,ADD,OR和其他一些操作数和逻辑指令，被这些指令操作的内存区域就会加锁，导致其他处理器不能同时访问它；一个简单内核系统sanos的原子操作[atomic.h](http://www.jbox.dk/sanos/source/include/atomic.h.html)；通过自旋锁(spin_lock)和互斥锁(mutex_lock)的比较，来选择适合的场景:  
 - [临界区执行时间短的情况：队列消费操作](https://gist.github.com/weedge/3f94e9c6144e6b3d11fa55f6801d0e1b)  
 - [临界区执行时间长的情况](https://gist.github.com/weedge/01d1a9934cbc61726793b80d044ce6ed)  
