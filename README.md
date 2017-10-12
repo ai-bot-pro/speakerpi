@@ -93,7 +93,7 @@ gpg -a --export KEY | sudo apt-key add -
 - snowboy.yml-dist (唤醒词配置)  
 将一上文件配置好后，修改成.yml的后缀
 
-> 添加开机启动
+> 添加开机启动(后续加入init.d里头，以服务的方式启动)
 ```
 robot_dir="/home/pi/xiaoc"
 bluetooth_mac=""
