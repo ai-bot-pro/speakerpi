@@ -114,7 +114,7 @@ fi
 ***示例***
 
 ### plugin
-&emsp;&emsp;插件开发(后续的设计完善参考es插件(比如IK分词(感叹一下，在工程中经常用到的小插件关注度往往比小众软件系统要高的多，这也和对应的生态有关系，所以选择很重要？喜欢就好吧！))的管理，其实思路一样(工程上的实现方式有些差异))，因为需要插件进程和父进程(bootstrap进程)通过管道通信，分为两种情况：1.插件进程运行不需要轮训，运行完就可以结束，开发可参考[音量控制插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/volume)；2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)。(ps:如果改成插件线程，可参考PHP中线程安全([ZTS](http://blog.codinglabs.org/articles/zend-thread-safety.html),想法借鉴就行了，至于它的实现。。。并发设计可以参考java中的java.util.concurrent并发框架包的实现)的设计想法)  
+&emsp;&emsp;插件开发(后续的设计完善参考es插件(比如IK分词(感叹一下，在工程中经常用到的小插件关注度往往比小众软件系统要高的多，这也和对应的生态有关系，所以选择很重要？喜欢就好吧！))的管理，其实思路一样(工程上的实现方式有些差异))，因为需要插件进程和父进程(bootstrap进程)通过管道通信，分为两种情况：1.插件进程运行不需要轮训，运行完就可以结束，开发可参考[音量控制插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/volume)；2.插件进程启动后不退出，轮训接受消息，需要结束消息/信号结束插件进程，开发可参考[新闻播报插件](https://github.com/weedge/doubanFmSpeackerPi/tree/master/plugin/feeds)。(ps:如果改成插件线程，可参考PHP中线程安全([ZTS](http://blog.codinglabs.org/articles/zend-thread-safety.html),想法借鉴就行了，至于它的实现。。。并发设计可以参考java中的java.util.concurrent并发框架包的实现)的设计想法；锁的底层实现是通过cpu处理器提供的一个LOCK＃信号处理，两种机制来保证原子操作：总线锁，缓存锁；处理器提供了很多LOCK前缀的指令来实现，比如交换指令XADD，CMPXCHG，ADD（加），OR（或）和其他一些操作数和逻辑指令，被这些指令操作的内存区域就会加锁，导致其他处理器不能同时访问它；(atomic)[http://www.jbox.dk/sanos/source/include/atomic.h.html])  
 - [x] doubanfm: 播放豆瓣电台,下一首,暂停,继续播放, 喜欢这首歌, 不喜欢这首歌, 删除这首歌, 不再播放这首歌, 不在播放这首歌, 播放到我的私人频道,切换到我的私人频道, 我的私人频道, 私人频道, 播放红心歌单, 切换到红心电台, 切换到红心歌单, 红心歌单, 红心电台, 播放红星歌单, 切换到红星电台, 切换到红星歌单, 红星歌单, 红星电台,下载, 下载这首歌,关闭豆瓣电台,结束豆瓣电台
 - [x] 音量控制: 安静,声音大一点,声音再小一点,打开声音,声音小一点,声音小点,声音在小一点,声音大点,静音,声音在大一点,声音再大一点 
 - [ ] 朗读诗歌
