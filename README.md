@@ -140,8 +140,9 @@ sudo pip install --upgrade numpy
 - mail.yml-dist (邮件服务配置)
 - monitor.yml-dist（监控插件配置）
 - snowboy.yml-dist (唤醒词配置)  
+将以上文件配置好后，修改成.yml的后缀。
 
-将以上文件配置好后，修改成.yml的后缀，安装vim，然后安装vim IDE 进行编辑：
+安装vim，然后安装vim IDE 进行编辑：
 ```
 sudo apt-get install vim
 git clone git://github.com/tlhunter/vimrc.git .vim
