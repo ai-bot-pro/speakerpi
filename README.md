@@ -99,7 +99,9 @@ deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main ui
 gpg --keyserver pgpkeys.mit.edu --recv-key KEY
 gpg -a --export KEY | sudo apt-key add -
 ```
-然后更新软件索引清单`sudo apt-get update`和比较索引清单更新依赖关系`sudo apt-get upgrade -y`，更新的时间可能比较长点。
+然后更新软件索引清单`sudo apt-get update`和比较索引清单更新依赖关系`sudo apt-get upgrade -y`，更新的时间可能比较长点；
+
+最后通过`sudo raspi-config`来设置vpc服务启用(用来通过手机，vpc客户端连接可视化操作，如果桌面系统),修改密码，hostname等。
 
 4. [设置蓝牙](https://www.raspberrypi.org/magpi/bluetooth-audio-raspberry-pi-3/)
 
