@@ -102,7 +102,8 @@ if [ x"$run" = x ];then
   date=`date '+%Y%m%d%H%M%S'`
   mv ${robot_dir}/log/robot.log ${robot_dir}/log/robot.${date}.log
   nohup sh ${robot_dir}/run.sh ${bluetooth_mac} > ${robot_dir}/log/robot.log 2>&1 &
-  rm_date=`date -d '2 days ago' +%Y%m%d`
+  find ${robot_dir}/log/ -type f -name "robot.*.log" -ctime +3 | xargs rm -f
+  #rm_date=`date -d '2 days ago' +%Y%m%d`
   #rm -f ${robot_dir}/log/robot.${rm_date}*.log
 fi
 ```
