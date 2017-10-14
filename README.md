@@ -96,6 +96,7 @@ deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ jessie main ui
 
 如果update的过程中会出现:`GPG 错误：http://mirrors.tuna.tsinghua.edu.cn jessie Release: 由于没有公钥，无法验证下列签名： NO_PUBKEY 8B48AD6246925553 NO_PUBKEY 7638D0442B90D010 NO_PUBKEY CBF8D6FD518E17E1`,通过如下命令解决(KEY为对应的pubkey)：
 ```
+sudo apt install dirmngr
 gpg --keyserver pgpkeys.mit.edu --recv-key KEY
 gpg -a --export KEY | sudo apt-key add -
 ```
