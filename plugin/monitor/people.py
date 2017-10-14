@@ -8,12 +8,17 @@ import threading
 import logging
 import yaml
 from flask import Flask, render_template, Response
-import cv2
 
 import lib.appPath
 from lib.baseClass import AbstractClass
 from lib.mail import SMTPMail
 from lib.camera import VideoCamera
+
+try:
+    import cv2
+except ImportError:
+    pass
+
 
 TAG = 'people'
 CATE = 'monitor'

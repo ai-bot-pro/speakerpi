@@ -3,5 +3,6 @@
 "hotwords": ""
 #识别因子，多个用,隔开,对应上面的唤醒词
 "sensitivity": "0.5"
-#训练好的识别模型文件，多个用,隔开,对应上面的唤醒词
+#训练好的识别模型文件(绝对路径)，多个用,隔开,对应上面的唤醒词
 "decoder_model": ""
+#"decoder_model": "/home/pi/xiaoc/data/snowboy/weedge.pmdl,/home/pi/xiaoc/data/snowboy/snowboy.pmdl"

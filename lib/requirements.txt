@@ -23,3 +23,7 @@ baidu-aip
 
 # process
 multiprocessing==2.6.2.1
+psutil
+
+cmuclmtk==0.1.5
+beautifulsoup4==4.3.2

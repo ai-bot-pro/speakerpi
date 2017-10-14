@@ -8,10 +8,14 @@ import struct
 import socket
 import picamera
 from PIL import Image
-from imutils.video.pivideostream import PiVideoStream
-import imutils
 import numpy as np
-import cv2
+
+try:
+    import cv2
+    import imutils
+    from imutils.video.pivideostream import PiVideoStream
+except ImportError:
+    pass
 
 import lib.appPath
 
