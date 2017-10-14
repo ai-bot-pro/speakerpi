@@ -12,7 +12,7 @@
 ### Thinking (mind mapping)
 - 人机交互(Server): 架构合理设计(骨架)，组件性能优化(器官)，业务逻辑抽象(肉体)，策略方案得当(思维)，数据深度挖掘(血液)，通俗易懂的api(颜值要高,HAL/REST(Swagger)/graphQL,schema校验(json schema))，高效信息沟通(IPC,RPC,消息队列,消息格式/协议可扩展)，物质基础牢靠(IDC,VPC,资源管理,资源调度,作业调度)，服务实时监控修复(monit,supervisor,metrics) 
 - 人机交互(Client): 交互简单，易用，便捷，高效；解决日常生活(吃穿住行,娱乐,监控)之琐碎，"懒"出新高度
-<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
+<div align="center"><img src="http://wx4.sinaimg.cn/large/646bc66fgy1fjkoihzpyfj21e70qa43q.jpg" width="100%" height="100%"></div>  
 <div align="center"><img src="https://raw.githubusercontent.com/weedge/doubanFmSpeackerPi/master/design.jpg" width="100%" height="100%"></div>  
 
 ### 硬件
@@ -57,7 +57,7 @@
 
 > 软件安装
 
-1.烧录一个最新的[raspbian系统](https://downloads.raspberrypi.org/raspbian_latest)镜像到SD卡中，这里介绍的是不需要显示器和鼠标，直接在系统安装设置好wifi配置，具体操作见这篇[文章](https://app.yinxiang.com/shard/s2/nl/452668/d10eb3bc-51ce-4ced-8754-61952de94d5b/)吧；
+1.烧录一个最新的[raspbian系统](https://downloads.raspberrypi.org/raspbian_latest)镜像到SD卡中，这里介绍的是不需要显示器和鼠标，直接在系统安装设置好wifi配置，具体操作见这篇[文章](https://app.yinxiang.com/shard/s2/nl/452668/d10eb3bc-51ce-4ced-8754-61952de94d5b/)吧；(ps: 其实还有一种更hack的方法，直接操作烧录好的系统文件，一般linux系统用的是ext系列的文件系统，可以通过Paragon extfs软件来加载ext文件系统，从而直接编辑系统文件配置，进行初始化安装启动）
 
 2.更新pi的源的时候需要把/etc/apt/sources.list和/etc/apt/sources.list.d/raspi.list文件这两个文件同时更新了：
 ```
