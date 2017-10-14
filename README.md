@@ -106,7 +106,7 @@ gpg -a --export KEY | sudo apt-key add -
 
 4. [设置蓝牙](https://www.raspberrypi.org/magpi/bluetooth-audio-raspberry-pi-3/)
 
-5. [安装opencv](https://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/)
+5. [安装opencv](https://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/),opencv安装的过程比较久，如果不想使用图像处理的插件(使用cv2库),可以不用安装，需要时在安装。
 
 6. 获取代码`cd ~ && git clone https://github.com/weedge/doubanFmSpeackerPi.git xiaoc`，通过pip安装对应lib包`cd xiaoc/lib && sudo pip install -r requirements.txt`
 
