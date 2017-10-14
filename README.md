@@ -125,6 +125,8 @@ sudo apt-get install python-pyaudio
 
 pi 默认是没有sox,play命令，需要安装：
 sudo apt-get install sox
+#支持MP3格式文件
+sudo apt-get install libsox-fmt-mp3
 
 python 的lib包通过upgrade更新,比如numpy这个常用的数学矩阵库:
 sudo pip install --upgrade numpy
