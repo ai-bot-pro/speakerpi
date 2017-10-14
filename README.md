@@ -140,7 +140,13 @@ sudo pip install --upgrade numpy
 - mail.yml-dist (邮件服务配置)
 - monitor.yml-dist（监控插件配置）
 - snowboy.yml-dist (唤醒词配置)  
-将一上文件配置好后，修改成.yml的后缀
+
+将以上文件配置好后，修改成.yml的后缀，安装vim，然后安装vim IDE 进行编辑：
+```
+sudo apt-get install vim
+git clone git://github.com/tlhunter/vimrc.git .vim
+ln ~/.vim/vimrc ~/.vimrc 
+```
 
 > 添加开机启动(后续加入init.d里头，以服务的方式启动)
 ```
