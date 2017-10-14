@@ -100,7 +100,7 @@ sudo apt install dirmngr
 gpg --keyserver pgpkeys.mit.edu --recv-key KEY
 gpg -a --export KEY | sudo apt-key add -
 ```
-然后更新软件索引清单`sudo apt-get update`和比较索引清单更新依赖关系`sudo apt-get upgrade -y`，更新的时间可能比较长点；
+然后更新软件索引清单`sudo apt-get update -o Debug::Acquire::http=true debug`(这里debug打印出获取清单静态资源的响应信息)和比较索引清单更新依赖关系`sudo apt-get upgrade -y`，更新的时间可能比较长点；
 
 最后通过`sudo raspi-config`来设置vpc服务启用(用来通过手机，vpc客户端连接可视化操作，如果桌面系统),修改密码，hostname等。
 
