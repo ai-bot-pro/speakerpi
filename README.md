@@ -81,7 +81,7 @@ network={
 }
 ```
    
-还有一种比较hack的方法，直接操作烧录好的系统文件，一般linux系统用的是ext系列的文件系统，可以通过Paragon extfs软件(主要是为了方便windows系统(除了widows10+，微软觉悟了)，闭源系统)来加载ext文件系统，从而直接编辑系统文件配置(etc文件夹中的相关配置文件，配置说明用man来查看具体含义吧,比如man services查看/etc/services配置说明)，然后进行初始化安装启动了。通过这种方式可以进行定制化，后续组一个[pi cluster in k8s](http://blog.kubernetes.io/2015/11/creating-a-Raspberry-Pi-cluster-running-Kubernetes-the-shopping-list-Part-1.html))
+还有一种比较hack的方法，直接操作烧录好的系统文件，一般linux系统用的是ext系列的文件系统，可以通过Paragon extfs软件来加载ext文件系统，从而直接编辑系统文件配置(etc文件夹中的相关配置文件，配置说明用man来查看具体含义吧,比如man services查看/etc/services配置说明)，然后进行初始化安装启动了。通过这种方式可以进行定制化，后续组一个[pi cluster in k8s](http://blog.kubernetes.io/2015/11/creating-a-Raspberry-Pi-cluster-running-Kubernetes-the-shopping-list-Part-1.html))
 
 3. 更新pi的源的时候需要把/etc/apt/sources.list和/etc/apt/sources.list.d/raspi.list文件这两个文件同时更新了：(notice:这里是以jessie版本为例,`lsb_release -a`查看发布的系统信息版本)
 ```
