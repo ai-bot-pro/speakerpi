@@ -46,11 +46,11 @@
 
 1. 首先需要了解下GPIO的结构,通过`gpio readall`命令查看对应开发版上的pin和BCM，如图所示:
 
-<div align="center"><img src="https://github.com/weedge/doubanFmSpeackerPi/blob/master/pi3-gpio.png" width="70%" height="70%"></div>
+<div align="center"><img src="http://wx1.sinaimg.cn/large/646bc66fgy1fkj1i3p828j20ry0gok62.jpg" width="70%" height="70%"></div>
 
 2. LED,Servo,USB Microphone的接入方式如下图所示：
 
-<div align="center"><img src="https://github.com/ibmtjbot/tjbot/raw/master/images/wiring.png" width="70%" height="70%"></div>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/646bc66fly1fkj0xb2ta7j212w0yakjl.jpg" width="70%" height="70%"></div>
 
 3. [摄像头安装](https://linux.cn/article-3650-1.html)
 
