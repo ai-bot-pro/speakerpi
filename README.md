@@ -102,7 +102,7 @@ gpg -a --export KEY | sudo apt-key add -
 ```
 然后更新软件索引清单`sudo apt-get update -o Debug::Acquire::http=true debug`(这里debug打印出获取清单静态资源的响应信息)和比较索引清单更新依赖关系`sudo apt-get upgrade -y`，更新的时间可能比较长点；
 
-最后通过`sudo raspi-config`来设置vpc服务启用(用来通过手机，vpc客户端连接可视化操作，如果桌面系统),修改密码，hostname等；对系统进行[汉化处理](https://app.yinxiang.com/shard/s2/nl/452668/801abbe5-f9b3-4c8a-acc3-ecebe0fc311d/)
+最后通过`sudo raspi-config`来设置vnc服务启用(用来通过手机，vnc客户端连接可视化操作，如果桌面系统),修改密码，hostname,时区等；对系统进行[汉化处理](https://app.yinxiang.com/shard/s2/nl/452668/801abbe5-f9b3-4c8a-acc3-ecebe0fc311d/)
 
 4. [设置蓝牙](https://www.raspberrypi.org/magpi/bluetooth-audio-raspberry-pi-3/)
 
