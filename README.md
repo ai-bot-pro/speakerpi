@@ -191,8 +191,6 @@ fi
 &emsp;&emsp;Client in PI [photographToClientSocket.py](https://gist.github.com/weedge/199010c48201ea9efe5c0e350ef5d02d),[videoToClientSocket.py](https://gist.github.com/weedge/86c356f1000fa03cc69edb905bd51dcb);  
 &emsp;&emsp;Server in my Mac [photographToServerSocket.py](https://gist.github.com/weedge/f87e84805b1e646514e17c2a6b1c8978), [videoToPlayerFromServerSocket.py](https://gist.github.com/weedge/ee9c99baffac998123cb27ea083dec0c).
 
-***[todo](https://github.com/weedge/doubanFmSpeackerPi/blob/master/TODO.md)**
-
 ***参考链接***
 1. [init系统介绍](https://www.ibm.com/developerworks/cn/linux/1407_liuming_init1/index.html)
 2. [snowboy](http://docs.kitt.ai/snowboy/)
@@ -212,3 +210,5 @@ fi
 现定义为桌面级产品(对于机器学习中的算法模型，可以作为验证已训练好模型的client工具环境)，代码请勿用于商业用途，如果有需要请联系作者(weege007#gmail)
 ### License
 This project uses the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) software license.
+
+### [todo](https://github.com/weedge/doubanFmSpeackerPi/blob/master/TODO.md)
