@@ -1,0 +1,9 @@
+openai_api_key: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxx'
+# 参数指定将生成文本的模型类型。目前支持 gpt-3.5-turbo 和 gpt-3.5-turbo-0301 两种选择
+model: 'gpt-3.5-turbo'
+# 在前面加的一段前缀
+prefix: '请用200字回答：'
+# 如果需要代理，反注释下面的配置进行修改
+# proxy: '127.0.0.1:1080'
+# 如果需要更换 api_base ，反注释下面的配置进行修改,比如直接通过代理地址
+# api_base: "https://api.openai.com/v1/chat"

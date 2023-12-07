@@ -57,7 +57,7 @@ class BaiduVoice(AbstractVoiceEngine):
                 lib.diagnose.check_python_import('aip') and
                 lib.diagnose.check_network_connection('www.baidu.com'))
 
-    def say(self, phrase,tag=None):
+    def say(self, phrase, cache=None):
         if not phrase: return False
         self._logger.debug("Saying '%s' with '%s'", phrase, self.TAG)
         result  = self._aipSpeech.synthesis(phrase, 'zh', 1, { 'per':self._per,'vol': 5, })
@@ -72,7 +72,7 @@ class BaiduVoice(AbstractVoiceEngine):
 
         if tmpfile is not None and os.path.exists(tmpfile):
             #写完了在播放，使用临时文件创建，防止多个进程操作一个文件
-            self.play(tmpfile,tag)
+            self.play(tmpfile,self.TAG)
             os.remove(tmpfile)
 
     def transcribe(self,fp):

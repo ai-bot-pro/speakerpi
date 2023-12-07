@@ -28,7 +28,6 @@ def check_network_connection(server="www.baidu.com"):
     @Returns:
         True or False
     """
-    logger = logging.getLogger(__name__)
     logger.debug("Checking network connection to server '%s'...", server)
     try:
         # see if we can resolve the host name -- tells us if there is
@@ -56,7 +55,6 @@ def check_executable(executable):
     @Returns:
         True or False
     """
-    logger = logging.getLogger(__name__)
     logger.debug("Checking executable '%s'...", executable)
     executable_path = find_executable(executable)
     found = executable_path is not None
@@ -79,7 +77,6 @@ def check_python_import(package_or_module):
     @Returns:
         True or False
     """
-    logger = logging.getLogger(__name__)
     logger.debug("Checking python import '%s'...", package_or_module)
     loader = pkgutil.get_loader(package_or_module)
     found = loader is not None
@@ -104,7 +101,6 @@ def get_pip_requirements(fname=os.path.join(appPath.LIB_PATH, 'requirements.txt'
     Returns:
         A list of pip requirement objects or None
     """
-    logger = logging.getLogger(__name__)
     if os.access(fname, os.R_OK):
         reqs = list(pip.req.parse_requirements(fname))
         logger.debug("Found %d PIP requirements in file '%s'", len(reqs),
@@ -123,7 +119,6 @@ def get_git_revision():
     Returns:
         A hex string or None
     """
-    logger = logging.getLogger(__name__)
     if not check_executable('git'):
         logger.warning("'git' command not found, git revision not detectable")
         return None

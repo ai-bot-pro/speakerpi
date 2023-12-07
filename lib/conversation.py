@@ -5,21 +5,6 @@ import lib.util
 from plugin.bootstrap import Bootstrap
 from lib.gpio.manager import Manager as gpioManager
 
-import signal
-
-interrupted = False
-
-def signal_handler(signal, frame):
-    global interrupted
-    interrupted = True
-
-def interrupt_callback():
-    global interrupted
-    return interrupted
-
-# capture SIGINT signal, e.g., Ctrl+C
-signal.signal(signal.SIGINT, signal_handler)
-
 class Conversation(object):
     """
     会话交互
@@ -33,10 +18,15 @@ class Conversation(object):
         self.speaker = speaker
         self.active_stt = active_stt
         self.passive_stt = passive_stt
+        try:
+            ai_chat_engine = bootstrap_config['ai_chat_engine']
+            self.ai_chat  = lib.util.get_engine_by_tag(ai_chat_engine,cate="aiChat").get_instance()
+        except KeyError:
+            self.ai_chat = None
         self.bootstrap_config = bootstrap_config
-        self.bootstrap = Bootstrap(speaker, bootstrap_config)
+        self.bootstrap = Bootstrap(speaker, self.ai_chat, bootstrap_config)
 
-    def handleForever(self,interrupt_check=interrupt_callback,queue=None):
+    def handleForever(self,interrupt_check=None,queue=None):
         self._logger.info("开始和机器人{ %s }会话", self.robot_name)
         init_talk_text = "hi,您好,我叫" + self.robot_name + ",很高兴认识你,您可以叫我名字唤醒我"
 
@@ -58,7 +48,7 @@ class Conversation(object):
         self.passive_mic.init_recording()
         while True:
             if interrupt_check is not None:
-                if interrupt_check(): 
+                if interrupt_check():
                     break
 
             threshold, transcribed = self.passive_mic.passiveListen(self.robot_name,
@@ -81,7 +71,11 @@ class Conversation(object):
                     queue.put(input)
                 else:
                     #直接将识别的指令发给bootstrap引导模块处理
-                    self.bootstrap.query(input)
+                    ok = self.bootstrap.query(input)
+                    #没有命中本地指令，进入聊天模式
+                    if ok is False and self.ai_chat is not None:
+                        stream = self.ai_chat.stream_chat(input) 
+                        self.speaker.stream_say(stream)
             else:
                 self.speaker.say("没听清楚您说什么")
 

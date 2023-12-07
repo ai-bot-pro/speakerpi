@@ -2,6 +2,7 @@
 import sys, os, time, random
 import re
 import json
+import yaml
 import argparse
 import logging
 import psutil
@@ -16,6 +17,7 @@ import lib.util
 import plugin.volume.pulseAudio 
 from plugin.fm.doubanFM import DoubanFM
 from lib.mail import SMTPMail
+from lib.aiChat import OpenaiChat
 from plugin.monitor.people import PeopleMonitor
 from plugin.feeds.jiqizhixin import JiqizhixinFeed
 import plugin.feeds.jiqizhixin
@@ -169,6 +171,33 @@ def jiqizhixinFeed(logger,args):
 
     logger.debug("debug jiqizhixinFeed is over")
 
+def debugOpenai(logger,args):
+    print("debugOpenai")
+
+    bootstrap_file = os.path.join(lib.appPath.CONFIG_PATH, 'bootstrap.yml')
+    if os.path.exists(bootstrap_file) is False:
+        logger.error("bootstrap file is not exists!")
+        return False
+
+    # Read config
+    logger.debug("Trying to read config file: '%s'", bootstrap_file)
+    try:
+        with open(bootstrap_file, "r") as f:
+            bootstrap_config = yaml.safe_load(f)
+    except OSError:
+        logger.error("Can't open config file: '%s'", bootstrap_file)
+        raise
+
+    ai_chat_engine = bootstrap_config['ai_chat_engine']
+    robot = lib.util.get_engine_by_tag(ai_chat_engine,cate="aiChat").get_instance()
+    #robot = OpenaiChat.get_instance()
+
+    stream = robot.stream_chat("你好！")
+    #stream = robot.stream_chat("LLM中transform是什么")
+
+    speaker = BaiduVoice.get_instance()
+    speaker.stream_say(stream)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='debug')
     parser.add_argument('--debug', action='store_true',
@@ -185,6 +214,9 @@ if __name__ == '__main__':
                         help='Show debug baidu graphic lib messages')
     parser.add_argument('--jiqizhixinFeed', action='store_true',
                         help='Show debug jiqizhixinFeed plugin messages')
+    parser.add_argument('--debugOpenai', action='store_true',
+                        help='Show debug openai')
+
 
     args = parser.parse_args()
     logging.basicConfig(stream=sys.stdout)
@@ -213,4 +245,8 @@ if __name__ == '__main__':
 
     if args.jiqizhixinFeed:
         jiqizhixinFeed(logger,args)
+        exit(0)
+
+    if args.debugOpenai:
+        debugOpenai(logger,args)
         exit(0)

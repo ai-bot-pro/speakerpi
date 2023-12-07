@@ -35,9 +35,6 @@ def interrupt_callback():
     global interrupted
     return interrupted
 
-# capture SIGINT signal, e.g., Ctrl+C
-signal.signal(signal.SIGINT, signal_handler)
-
 def run(robot_name="ROBOT",logger=None,args=None):
     bootstrap_file = os.path.join(lib.appPath.CONFIG_PATH, 'bootstrap.yml')
     if os.path.exists(bootstrap_file) is False:
@@ -162,7 +159,11 @@ def debugLed(logger,args):
     print("-----led breath----")
     Led.get_instance().breath(10)
 
+
 if __name__ == '__main__':
+    # capture SIGINT signal, e.g., Ctrl+C
+    signal.signal(signal.SIGINT, signal_handler)
+
     parser = argparse.ArgumentParser(description='doubanFM pi')
     parser.add_argument('--debug', action='store_true',
                         help='Show debug messages')
@@ -178,6 +179,7 @@ if __name__ == '__main__':
                         help='Show debug create daemon porcessor messages')
     parser.add_argument('--debugMic', action='store_true',
                         help='Show debug mic messages')
+
     args = parser.parse_args()
     
     logging.basicConfig(stream=sys.stdout)

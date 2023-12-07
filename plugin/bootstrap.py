@@ -12,12 +12,13 @@ from lib.gpio.led import Led
 
 class Bootstrap(object):
 
-    def __init__(self, speaker, config):
+    def __init__(self, speaker, ai_chat, config):
         """
         加载插件，通过指令引导执行对应插件模块
         """
         self._logger = lib.util.init_logger(__name__)
         self.speaker = speaker
+        self.ai_chat = ai_chat
         self.config = config
         self.plugins = self.get_plugins(config)
 
@@ -176,9 +177,11 @@ class Bootstrap(object):
                     else:
                         self._logger.debug("Send Pipe Handling of phrase '%s' by " + "plugin '%s' completed", text, plugin.CATE+"_"+plugin.__name__)
                     finally:
-                        return
+                        return True
         self._logger.debug("No plugin was able to handle any of these " + "phrases: %r", texts)
-        self.speaker.say("您说的是"+text.encode('UTF-8')+"吗，我可能没有听清楚")
+        if self.ai_chat is None:
+            self.speaker.say("您说的是"+text.encode('UTF-8')+"吗，我可能没有听清楚")
+        return False
 
         
     @classmethod

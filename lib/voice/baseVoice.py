@@ -7,12 +7,10 @@ import tempfile
 import subprocess
 import psutil
 import signal
+import yaml
 from abc import ABCMeta, abstractmethod
 
-import yaml
-
-import lib.diagnose
-import lib.appPath
+import lib
 
 class AbstractVoiceEngine(object):
     """
@@ -36,19 +34,37 @@ class AbstractVoiceEngine(object):
         return lib.diagnose.check_executable('play')
 
     def __init__(self, **kwargs):
-        self._logger = logging.getLogger(__name__)
-
-        config_path = os.path.join(lib.appPath.CONFIG_PATH, 'log.yml');
-        if os.path.exists(config_path):
-            with open(config_path, 'r') as f:
-                profile = yaml.safe_load(f)
-                if 'level' in profile:
-                    self._logger.setLevel(eval("logging."+profile['level']))
+        self._logger = lib.util.init_logger(__name__)
 
     @abstractmethod
-    def say(self, phrase):
+    def say(self, phrase, cache=None):
         self._logger.info("Saying '%s' with dummy speaker", phrase)
         pass
+
+    def stream_say(self, stream, cache=None):
+        lines = []
+        line = ""
+        audios = []
+        index = 0
+        skip_tts = False
+        for data in stream():
+            line += data
+            if any(char.decode("utf-8") in data for char in lib.util.getPunctuations()):
+                if "```" in line.strip():
+                    skip_tts = True
+                if not skip_tts:
+                    audio = self.say(line.strip(), cache)
+                    if audio:
+                        audios.append(audio)
+                        index += 1
+                else:
+                    self._logger.info("%s skip code"%(line,))
+                lines.append(line)
+                line = ""
+        if line.strip():
+            lines.append(line)
+        if skip_tts:
+            self.say("内容包含代码,已跳过", True)
 
     @abstractmethod
     def transcribe(self, fp):

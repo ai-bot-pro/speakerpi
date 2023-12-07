@@ -1,9 +1,11 @@
 #语音唤醒: tag
 passive_stt_engine: "snowboy"
-#语音识别: tag
+#语音识别asr: tag
 active_stt_engine: "baidu-ai-voice"
-#语音合成: tag
+#语音合成tts: tag
 speak_engine: "baidu-ai-voice"
+#AI聊天chat: tag
+ai_chat_engine: "openai"
 #是否启用通过GPIO控制的外设,默认不开启为no;开启为yes
 robot_open_shake_bling: "no"
 

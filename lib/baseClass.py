@@ -3,6 +3,7 @@
 import os 
 from abc import ABCMeta, abstractmethod
 
+import lib.appPath
 import lib.util
 
 class AbstractClass(object):

@@ -7,6 +7,7 @@ import yaml
 import re
 
 from lib.voice.baseVoice import AbstractVoiceEngine
+from lib.aiChat import BaseChat
 import lib.appPath
 
 def create_daemon(daemon_callback=None,args=()):
@@ -72,6 +73,9 @@ def init_logger(name=""):
     """
     初始日志
     """
+    format = "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - line %(lineno)s - %(levelname)s - %(message)s"
+    DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+    logging.basicConfig(stream=sys.stdout,format=format,datefmt=DATE_FORMAT)
     logger = logging.getLogger(name)
 
     config_path = os.path.join(lib.appPath.CONFIG_PATH, 'log.yml');
@@ -103,6 +107,10 @@ def get_engines_by_cate(cate='voice'):
         return [engine for engine in
             list(get_subclasses(AbstractVoiceEngine))
             if hasattr(engine, 'TAG') and engine.TAG]
+    if cate is 'aiChat':
+        return [engine for engine in
+            list(get_subclasses(BaseChat))
+            if hasattr(engine, 'TAG') and engine.TAG]
 
 def get_engine_by_tag(tag=None,cate='voice'):
     """
@@ -110,19 +118,33 @@ def get_engine_by_tag(tag=None,cate='voice'):
     没有引擎抛出异常
     """
     if not tag or type(tag) is not str:
-        raise TypeError("Invalid engine tag '%s'", tag)
+        raise TypeError("Invalid engine cage %s tag '%s'"%(cate,tag))
 
     selected_engines = filter(lambda engine: hasattr(engine, "TAG") and
                               engine.TAG == tag, get_engines_by_cate(cate))
     if len(selected_engines) == 0:
-        raise ValueError("No STT engine found for tag '%s'" % tag)
+        raise ValueError("cate %s No engine found for tag '%s'" % (cate,tag))
     else:
         if len(selected_engines) > 1:
-            print(("WARNING: Multiple STT engines found for tag '%s'. " +
-                   "This is most certainly a bug.") % tag)
+            print(("WARNING: cate %s Multiple engines found for tag '%s'. " +
+                   "This is most certainly a bug.") % (cate,tag))
         engine = selected_engines[0]
         if not engine.is_available():
-            raise ValueError(("STT engine '%s' is not available (due to " +
+            raise ValueError(("cate %s engine '%s' is not available (due to " +
                               "missing dependencies, missing " +
-                              "dependencies, etc.)") % tag)
+                              "dependencies, etc.)") % (cate,tag))
         return engine
+
+def getPunctuations():
+    return [",", "，", ".", "。", "?", "？", "!", "！", "\n"]
+
+
+def stripPunctuation(s):
+    """
+    移除字符串末尾的标点
+    """
+    punctuations = getPunctuations()
+    if any(s.endswith(p.decode("utf-8")) for p in punctuations):
+        s = s[:-1]
+    return s
+

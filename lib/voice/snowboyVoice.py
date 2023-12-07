@@ -68,7 +68,7 @@ class SnowboyVoice(AbstractVoiceEngine):
         return (super(cls, cls).is_available() and
                 lib.diagnose.check_python_import('lib.voice.snowboy.snowboydetect'))
 
-    def say(self, phrase, *args):
+    def say(self, phrase, cache=None):
         pass
 
     def transcribe(self,fp):
