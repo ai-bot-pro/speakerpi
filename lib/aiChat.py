@@ -143,6 +143,7 @@ class OpenaiChat(BaseChat):
                                         yield delta_content
 
                     elif len(line_str.strip()) > 0:
+                        self.context = []
                         self._logger.debug("line_str:%s",line_str)
                         yield line_str
 
